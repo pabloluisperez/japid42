@@ -1,7 +1,5 @@
 package cn.bran.japid.compiler;
 
-import japa.parser.ast.body.Parameter;
-
 import java.util.List;
 
 import cn.bran.japid.util.StringUtils;
@@ -21,7 +19,8 @@ public class TagInvocationLineParser {
 	 * @param line
 	 * @return
 	 */
-	public Tag parse(String line) {
+	public Tag parse(String _line) {
+		String line = _line;
 		// String original = line;
 		Tag tag = new Tag();
 
@@ -30,17 +29,15 @@ public class TagInvocationLineParser {
 			char c = line.charAt(i);
 			if (Character.isJavaIdentifierPart(c) || c == '.' || c == '/') {
 				continue;
-			} else {
-				if (Character.isWhitespace(c) || c == '(' || c == '|') {
-					tag.tagName = line.substring(0, i).replace('/', '.');
-					if (tag.tagName.startsWith(".."))
-						tag.tagName = tag.tagName.substring(1);
-					line = line.substring(i).trim();
-					break;
-				} else {
-					throw new RuntimeException("invalid character in the tag invocation line " + line + ": [" + c + "]");
-				}
 			}
+			if (Character.isWhitespace(c) || c == '(' || c == '|') {
+				tag.tagName = line.substring(0, i).replace('/', '.');
+				if (tag.tagName.startsWith(".."))
+					tag.tagName = tag.tagName.substring(1);
+				line = line.substring(i).trim();
+				break;
+			}
+			throw new RuntimeException("invalid character in the tag invocation line " + line + ": [" + c + "]");
 		}
 		if (tag.tagName == null) {
 			// there was no end char in the line. so the whole line is the tag
@@ -98,7 +95,8 @@ public class TagInvocationLineParser {
 		return tag;
 	}
 
-	private void parseTagCallWithCallback(String line, Tag tag) {
+	private void parseTagCallWithCallback(String _line, Tag tag) {
+		String line = _line;
 		int vertline = line.lastIndexOf('|');
 		if (vertline >= 0) {
 			String closureArgs = line.substring(vertline + 1).trim();
@@ -110,22 +108,19 @@ public class TagInvocationLineParser {
 
 			if (line.length() == 0)
 				return;
-			else {
-				// parse args.
-				char firstC = line.charAt(0);
-				char lastC = line.charAt(line.length() - 1);
-				if ('(' == firstC) {
-					if (')' != lastC) {
-						throw new RuntimeException("The tag argument part is not valid: parenthesis is not paired.");
-					} else {
-						tag.args = line.substring(1, line.length() - 1);
-					}
-				} else {
-					tag.args = line;
+			// parse args.
+			char firstC = line.charAt(0);
+			char lastC = line.charAt(line.length() - 1);
+			if ('(' == firstC) {
+				if (')' != lastC) {
+					throw new RuntimeException("The tag argument part is not valid: parenthesis is not paired.");
 				}
-
-				parseNamedArgs(tag);
+				tag.args = line.substring(1, line.length() - 1);
+			} else {
+				tag.args = line;
 			}
+
+			parseNamedArgs(tag);
 		} else
 			throw new RuntimeException("tag args not valid: " + line);
 	}

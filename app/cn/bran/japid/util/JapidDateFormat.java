@@ -275,7 +275,8 @@ public class JapidDateFormat extends Format {
      * @throws IllegalArgumentException if the Locale has no date
      *  pattern defined
      */
-    public static synchronized JapidDateFormat getDateInstance(int style, TimeZone timeZone, Locale locale) {
+    public static synchronized JapidDateFormat getDateInstance(int style, TimeZone timeZone, Locale _locale) {
+    	Locale locale = _locale;
         Object key = new Integer(style);
         if (timeZone != null) {
             key = new Pair(key, timeZone);
@@ -360,7 +361,8 @@ public class JapidDateFormat extends Format {
      * @throws IllegalArgumentException if the Locale has no time
      *  pattern defined
      */
-    public static synchronized JapidDateFormat getTimeInstance(int style, TimeZone timeZone, Locale locale) {
+    public static synchronized JapidDateFormat getTimeInstance(int style, TimeZone timeZone, Locale _locale) {
+    	Locale locale = _locale;
         Object key = new Integer(style);
         if (timeZone != null) {
             key = new Pair(key, timeZone);
@@ -453,8 +455,8 @@ public class JapidDateFormat extends Format {
      *  pattern defined
      */
     public static synchronized JapidDateFormat getDateTimeInstance(int dateStyle, int timeStyle, TimeZone timeZone,
-            Locale locale) {
-
+            Locale _locale) {
+    	Locale locale = _locale;
         Object key = new Pair(new Integer(dateStyle), new Integer(timeStyle));
         if (timeZone != null) {
             key = new Pair(key, timeZone);
@@ -529,24 +531,26 @@ public class JapidDateFormat extends Format {
      * @throws IllegalArgumentException if pattern is invalid or
      *  <code>null</code>
      */
-    protected JapidDateFormat(String pattern, TimeZone timeZone, Locale locale) {
+    protected JapidDateFormat(String pattern, TimeZone _timeZone, Locale _locale) {
         super();
+    	TimeZone timeZone = _timeZone;
+    	Locale locale = _locale;
         if (pattern == null) {
             throw new IllegalArgumentException("The pattern must not be null");
         }
-        mPattern = pattern;
+        this.mPattern = pattern;
         
-        mTimeZoneForced = (timeZone != null);
+        this.mTimeZoneForced = (timeZone != null);
         if (timeZone == null) {
             timeZone = TimeZone.getDefault();
         }
-        mTimeZone = timeZone;
+        this.mTimeZone = timeZone;
         
-        mLocaleForced = (locale != null);
+        this.mLocaleForced = (locale != null);
         if (locale == null) {
             locale = Locale.getDefault();
         }
-        mLocale = locale;
+        this.mLocale = locale;
     }
 
     /**
@@ -554,14 +558,14 @@ public class JapidDateFormat extends Format {
      */
     protected void init() {
         List rulesList = parsePattern();
-        mRules = (Rule[]) rulesList.toArray(new Rule[rulesList.size()]);
+        this.mRules = (Rule[]) rulesList.toArray(new Rule[rulesList.size()]);
 
         int len = 0;
-        for (int i=mRules.length; --i >= 0; ) {
-            len += mRules[i].estimateLength();
+        for (int i=this.mRules.length; --i >= 0; ) {
+            len += this.mRules[i].estimateLength();
         }
 
-        mMaxLengthEstimate = len;
+        this.mMaxLengthEstimate = len;
     }
 
     // Parse the pattern
@@ -573,7 +577,7 @@ public class JapidDateFormat extends Format {
      * @throws IllegalArgumentException if pattern is invalid
      */
     protected List parsePattern() {
-        DateFormatSymbols symbols = new DateFormatSymbols(mLocale);
+        DateFormatSymbols symbols = new DateFormatSymbols(this.mLocale);
         List rules = new ArrayList();
 
         String[] ERAs = symbols.getEras();
@@ -583,12 +587,12 @@ public class JapidDateFormat extends Format {
         String[] shortWeekdays = symbols.getShortWeekdays();
         String[] AmPmStrings = symbols.getAmPmStrings();
 
-        int length = mPattern.length();
+        int length = this.mPattern.length();
         int[] indexRef = new int[1];
 
         for (int i = 0; i < length; i++) {
             indexRef[0] = i;
-            String token = parseToken(mPattern, indexRef);
+            String token = parseToken(this.mPattern, indexRef);
             i = indexRef[0];
 
             int tokenLen = token.length();
@@ -665,9 +669,9 @@ public class JapidDateFormat extends Format {
                 break;
             case 'z': // time zone (text)
                 if (tokenLen >= 4) {
-                    rule = new TimeZoneNameRule(mTimeZone, mTimeZoneForced, mLocale, TimeZone.LONG);
+                    rule = new TimeZoneNameRule(this.mTimeZone, this.mTimeZoneForced, this.mLocale, TimeZone.LONG);
                 } else {
-                    rule = new TimeZoneNameRule(mTimeZone, mTimeZoneForced, mLocale, TimeZone.SHORT);
+                    rule = new TimeZoneNameRule(this.mTimeZone, this.mTimeZoneForced, this.mLocale, TimeZone.SHORT);
                 }
                 break;
             case 'Z': // time zone (value)
@@ -783,7 +787,8 @@ public class JapidDateFormat extends Format {
      * @param pos  the position - ignored
      * @return the buffer passed in
      */
-    public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
+    @Override
+	public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
         if (obj instanceof Date) {
             return format((Date) obj, toAppendTo);
         } else if (obj instanceof Calendar) {
@@ -814,9 +819,9 @@ public class JapidDateFormat extends Format {
      * @return the formatted string
      */
     public String format(Date date) {
-        Calendar c = new GregorianCalendar(mTimeZone);
+        Calendar c = new GregorianCalendar(this.mTimeZone);
         c.setTime(date);
-        return applyRules(c, new StringBuffer(mMaxLengthEstimate)).toString();
+        return applyRules(c, new StringBuffer(this.mMaxLengthEstimate)).toString();
     }
 
     /**
@@ -826,7 +831,7 @@ public class JapidDateFormat extends Format {
      * @return the formatted string
      */
     public String format(Calendar calendar) {
-        return format(calendar, new StringBuffer(mMaxLengthEstimate)).toString();
+        return format(calendar, new StringBuffer(this.mMaxLengthEstimate)).toString();
     }
 
     /**
@@ -851,7 +856,7 @@ public class JapidDateFormat extends Format {
      * @return the specified string buffer
      */
     public StringBuffer format(Date date, StringBuffer buf) {
-        Calendar c = new GregorianCalendar(mTimeZone);
+        Calendar c = new GregorianCalendar(this.mTimeZone);
         c.setTime(date);
         return applyRules(c, buf);
     }
@@ -864,10 +869,11 @@ public class JapidDateFormat extends Format {
      * @param buf  the buffer to format into
      * @return the specified string buffer
      */
-    public StringBuffer format(Calendar calendar, StringBuffer buf) {
-        if (mTimeZoneForced) {
+    public StringBuffer format(Calendar _calendar, StringBuffer buf) {
+    	Calendar calendar = _calendar;
+        if (this.mTimeZoneForced) {
             calendar = (Calendar) calendar.clone();
-            calendar.setTimeZone(mTimeZone);
+            calendar.setTimeZone(this.mTimeZone);
         }
         return applyRules(calendar, buf);
     }
@@ -881,8 +887,8 @@ public class JapidDateFormat extends Format {
      * @return the specified string buffer
      */
     protected StringBuffer applyRules(Calendar calendar, StringBuffer buf) {
-        Rule[] rules = mRules;
-        int len = mRules.length;
+        Rule[] rules = this.mRules;
+        int len = this.mRules.length;
         for (int i = 0; i < len; i++) {
             rules[i].appendTo(buf, calendar);
         }
@@ -898,7 +904,8 @@ public class JapidDateFormat extends Format {
      * @param pos  the parsing position
      * @return <code>null</code> as not supported
      */
-    public Object parseObject(String source, ParsePosition pos) {
+    @Override
+	public Object parseObject(String source, ParsePosition pos) {
         pos.setIndex(0);
         pos.setErrorIndex(0);
         return null;
@@ -912,7 +919,7 @@ public class JapidDateFormat extends Format {
      * @return the pattern, {@link java.text.SimpleDateFormat} compatible
      */
     public String getPattern() {
-        return mPattern;
+        return this.mPattern;
     }
 
     /**
@@ -926,7 +933,7 @@ public class JapidDateFormat extends Format {
      * @return the time zone
      */
     public TimeZone getTimeZone() {
-        return mTimeZone;
+        return this.mTimeZone;
     }
 
     /**
@@ -937,7 +944,7 @@ public class JapidDateFormat extends Format {
      *  overridden for calendars
      */
     public boolean getTimeZoneOverridesCalendar() {
-        return mTimeZoneForced;
+        return this.mTimeZoneForced;
     }
 
     /**
@@ -946,7 +953,7 @@ public class JapidDateFormat extends Format {
      * @return the locale
      */
     public Locale getLocale() {
-        return mLocale;
+        return this.mLocale;
     }
 
     /**
@@ -959,7 +966,7 @@ public class JapidDateFormat extends Format {
      * @return the maximum formatted length
      */
     public int getMaxLengthEstimate() {
-        return mMaxLengthEstimate;
+        return this.mMaxLengthEstimate;
     }
 
     // Basics
@@ -970,17 +977,18 @@ public class JapidDateFormat extends Format {
      * @param obj  the object to compare to
      * @return <code>true</code> if equal
      */
-    public boolean equals(Object obj) {
+    @Override
+	public boolean equals(Object obj) {
         if (obj instanceof JapidDateFormat == false) {
             return false;
         }
         JapidDateFormat other = (JapidDateFormat) obj;
         if (
-            (mPattern == other.mPattern || mPattern.equals(other.mPattern)) &&
-            (mTimeZone == other.mTimeZone || mTimeZone.equals(other.mTimeZone)) &&
-            (mLocale == other.mLocale || mLocale.equals(other.mLocale)) &&
-            (mTimeZoneForced == other.mTimeZoneForced) &&
-            (mLocaleForced == other.mLocaleForced)
+            (this.mPattern == other.mPattern || this.mPattern.equals(other.mPattern)) &&
+            (this.mTimeZone == other.mTimeZone || this.mTimeZone.equals(other.mTimeZone)) &&
+            (this.mLocale == other.mLocale || this.mLocale.equals(other.mLocale)) &&
+            (this.mTimeZoneForced == other.mTimeZoneForced) &&
+            (this.mLocaleForced == other.mLocaleForced)
             ) {
             return true;
         }
@@ -992,13 +1000,14 @@ public class JapidDateFormat extends Format {
      * 
      * @return a hashcode compatible with equals
      */
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         int total = 0;
-        total += mPattern.hashCode();
-        total += mTimeZone.hashCode();
-        total += (mTimeZoneForced ? 1 : 0);
-        total += mLocale.hashCode();
-        total += (mLocaleForced ? 1 : 0);
+        total += this.mPattern.hashCode();
+        total += this.mTimeZone.hashCode();
+        total += (this.mTimeZoneForced ? 1 : 0);
+        total += this.mLocale.hashCode();
+        total += (this.mLocaleForced ? 1 : 0);
         return total;
     }
 
@@ -1007,8 +1016,9 @@ public class JapidDateFormat extends Format {
      * 
      * @return a debugging string
      */
-    public String toString() {
-        return "JapidDateFormat[" + mPattern + "]";
+    @Override
+	public String toString() {
+        return "JapidDateFormat[" + this.mPattern + "]";
     }
 
     // Serializing
@@ -1074,21 +1084,23 @@ public class JapidDateFormat extends Format {
          * @param value the character literal
          */
         CharacterLiteral(char value) {
-            mValue = value;
+            this.mValue = value;
         }
 
         /**
          * {@inheritDoc}
          */
-        public int estimateLength() {
+        @Override
+		public int estimateLength() {
             return 1;
         }
 
         /**
          * {@inheritDoc}
          */
-        public void appendTo(StringBuffer buffer, Calendar calendar) {
-            buffer.append(mValue);
+        @Override
+		public void appendTo(StringBuffer buffer, Calendar calendar) {
+            buffer.append(this.mValue);
         }
     }
 
@@ -1105,21 +1117,23 @@ public class JapidDateFormat extends Format {
          * @param value the string literal
          */
         StringLiteral(String value) {
-            mValue = value;
+            this.mValue = value;
         }
 
         /**
          * {@inheritDoc}
          */
-        public int estimateLength() {
-            return mValue.length();
+        @Override
+		public int estimateLength() {
+            return this.mValue.length();
         }
 
         /**
          * {@inheritDoc}
          */
-        public void appendTo(StringBuffer buffer, Calendar calendar) {
-            buffer.append(mValue);
+        @Override
+		public void appendTo(StringBuffer buffer, Calendar calendar) {
+            buffer.append(this.mValue);
         }
     }
 
@@ -1138,17 +1152,18 @@ public class JapidDateFormat extends Format {
          * @param values the field values
          */
         TextField(int field, String[] values) {
-            mField = field;
-            mValues = values;
+            this.mField = field;
+            this.mValues = values;
         }
 
         /**
          * {@inheritDoc}
          */
-        public int estimateLength() {
+        @Override
+		public int estimateLength() {
             int max = 0;
-            for (int i=mValues.length; --i >= 0; ) {
-                int len = mValues[i].length();
+            for (int i=this.mValues.length; --i >= 0; ) {
+                int len = this.mValues[i].length();
                 if (len > max) {
                     max = len;
                 }
@@ -1159,8 +1174,9 @@ public class JapidDateFormat extends Format {
         /**
          * {@inheritDoc}
          */
-        public void appendTo(StringBuffer buffer, Calendar calendar) {
-            buffer.append(mValues[calendar.get(mField)]);
+        @Override
+		public void appendTo(StringBuffer buffer, Calendar calendar) {
+            buffer.append(this.mValues[calendar.get(this.mField)]);
         }
     }
 
@@ -1178,27 +1194,30 @@ public class JapidDateFormat extends Format {
          * @param field the field
          */
         UnpaddedNumberField(int field) {
-            mField = field;
+            this.mField = field;
         }
 
         /**
          * {@inheritDoc}
          */
-        public int estimateLength() {
+        @Override
+		public int estimateLength() {
             return 4;
         }
 
         /**
          * {@inheritDoc}
          */
-        public void appendTo(StringBuffer buffer, Calendar calendar) {
-            appendTo(buffer, calendar.get(mField));
+        @Override
+		public void appendTo(StringBuffer buffer, Calendar calendar) {
+            appendTo(buffer, calendar.get(this.mField));
         }
 
         /**
          * {@inheritDoc}
          */
-        public final void appendTo(StringBuffer buffer, int value) {
+        @Override
+		public final void appendTo(StringBuffer buffer, int value) {
             if (value < 10) {
                 buffer.append((char)(value + '0'));
             } else if (value < 100) {
@@ -1227,21 +1246,24 @@ public class JapidDateFormat extends Format {
         /**
          * {@inheritDoc}
          */
-        public int estimateLength() {
+        @Override
+		public int estimateLength() {
             return 2;
         }
 
         /**
          * {@inheritDoc}
          */
-        public void appendTo(StringBuffer buffer, Calendar calendar) {
+        @Override
+		public void appendTo(StringBuffer buffer, Calendar calendar) {
             appendTo(buffer, calendar.get(Calendar.MONTH) + 1);
         }
 
         /**
          * {@inheritDoc}
          */
-        public final void appendTo(StringBuffer buffer, int value) {
+        @Override
+		public final void appendTo(StringBuffer buffer, int value) {
             if (value < 10) {
                 buffer.append((char)(value + '0'));
             } else {
@@ -1269,30 +1291,33 @@ public class JapidDateFormat extends Format {
                 // Should use UnpaddedNumberField or TwoDigitNumberField.
                 throw new IllegalArgumentException();
             }
-            mField = field;
-            mSize = size;
+            this.mField = field;
+            this.mSize = size;
         }
 
         /**
          * {@inheritDoc}
          */
-        public int estimateLength() {
+        @Override
+		public int estimateLength() {
             return 4;
         }
 
         /**
          * {@inheritDoc}
          */
-        public void appendTo(StringBuffer buffer, Calendar calendar) {
-            appendTo(buffer, calendar.get(mField));
+        @Override
+		public void appendTo(StringBuffer buffer, Calendar calendar) {
+            appendTo(buffer, calendar.get(this.mField));
         }
 
         /**
          * {@inheritDoc}
          */
-        public final void appendTo(StringBuffer buffer, int value) {
+        @Override
+		public final void appendTo(StringBuffer buffer, int value) {
             if (value < 100) {
-                for (int i = mSize; --i >= 2; ) {
+                for (int i = this.mSize; --i >= 2; ) {
                     buffer.append('0');
                 }
                 buffer.append((char)(value / 10 + '0'));
@@ -1305,7 +1330,7 @@ public class JapidDateFormat extends Format {
                     isTrue(value > -1, "Negative values should not be possible", value);
                     digits = Integer.toString(value).length();
                 }
-                for (int i = mSize; --i >= digits; ) {
+                for (int i = this.mSize; --i >= digits; ) {
                     buffer.append('0');
                 }
                 buffer.append(Integer.toString(value));
@@ -1331,27 +1356,30 @@ public class JapidDateFormat extends Format {
          * @param field the field
          */
         TwoDigitNumberField(int field) {
-            mField = field;
+            this.mField = field;
         }
 
         /**
          * {@inheritDoc}
          */
-        public int estimateLength() {
+        @Override
+		public int estimateLength() {
             return 2;
         }
 
         /**
          * {@inheritDoc}
          */
-        public void appendTo(StringBuffer buffer, Calendar calendar) {
-            appendTo(buffer, calendar.get(mField));
+        @Override
+		public void appendTo(StringBuffer buffer, Calendar calendar) {
+            appendTo(buffer, calendar.get(this.mField));
         }
 
         /**
          * {@inheritDoc}
          */
-        public final void appendTo(StringBuffer buffer, int value) {
+        @Override
+		public final void appendTo(StringBuffer buffer, int value) {
             if (value < 100) {
                 buffer.append((char)(value / 10 + '0'));
                 buffer.append((char)(value % 10 + '0'));
@@ -1377,21 +1405,24 @@ public class JapidDateFormat extends Format {
         /**
          * {@inheritDoc}
          */
-        public int estimateLength() {
+        @Override
+		public int estimateLength() {
             return 2;
         }
 
         /**
          * {@inheritDoc}
          */
-        public void appendTo(StringBuffer buffer, Calendar calendar) {
+        @Override
+		public void appendTo(StringBuffer buffer, Calendar calendar) {
             appendTo(buffer, calendar.get(Calendar.YEAR) % 100);
         }
 
         /**
          * {@inheritDoc}
          */
-        public final void appendTo(StringBuffer buffer, int value) {
+        @Override
+		public final void appendTo(StringBuffer buffer, int value) {
             buffer.append((char)(value / 10 + '0'));
             buffer.append((char)(value % 10 + '0'));
         }
@@ -1413,21 +1444,24 @@ public class JapidDateFormat extends Format {
         /**
          * {@inheritDoc}
          */
-        public int estimateLength() {
+        @Override
+		public int estimateLength() {
             return 2;
         }
 
         /**
          * {@inheritDoc}
          */
-        public void appendTo(StringBuffer buffer, Calendar calendar) {
+        @Override
+		public void appendTo(StringBuffer buffer, Calendar calendar) {
             appendTo(buffer, calendar.get(Calendar.MONTH) + 1);
         }
 
         /**
          * {@inheritDoc}
          */
-        public final void appendTo(StringBuffer buffer, int value) {
+        @Override
+		public final void appendTo(StringBuffer buffer, int value) {
             buffer.append((char)(value / 10 + '0'));
             buffer.append((char)(value % 10 + '0'));
         }
@@ -1446,32 +1480,35 @@ public class JapidDateFormat extends Format {
          * @param rule the rule
          */
         TwelveHourField(NumberRule rule) {
-            mRule = rule;
+            this.mRule = rule;
         }
 
         /**
          * {@inheritDoc}
          */
-        public int estimateLength() {
-            return mRule.estimateLength();
+        @Override
+		public int estimateLength() {
+            return this.mRule.estimateLength();
         }
 
         /**
          * {@inheritDoc}
          */
-        public void appendTo(StringBuffer buffer, Calendar calendar) {
+        @Override
+		public void appendTo(StringBuffer buffer, Calendar calendar) {
             int value = calendar.get(Calendar.HOUR);
             if (value == 0) {
                 value = calendar.getLeastMaximum(Calendar.HOUR) + 1;
             }
-            mRule.appendTo(buffer, value);
+            this.mRule.appendTo(buffer, value);
         }
 
         /**
          * {@inheritDoc}
          */
-        public void appendTo(StringBuffer buffer, int value) {
-            mRule.appendTo(buffer, value);
+        @Override
+		public void appendTo(StringBuffer buffer, int value) {
+            this.mRule.appendTo(buffer, value);
         }
     }
 
@@ -1488,32 +1525,35 @@ public class JapidDateFormat extends Format {
          * @param rule the rule
          */
         TwentyFourHourField(NumberRule rule) {
-            mRule = rule;
+            this.mRule = rule;
         }
 
         /**
          * {@inheritDoc}
          */
-        public int estimateLength() {
-            return mRule.estimateLength();
+        @Override
+		public int estimateLength() {
+            return this.mRule.estimateLength();
         }
 
         /**
          * {@inheritDoc}
          */
-        public void appendTo(StringBuffer buffer, Calendar calendar) {
+        @Override
+		public void appendTo(StringBuffer buffer, Calendar calendar) {
             int value = calendar.get(Calendar.HOUR_OF_DAY);
             if (value == 0) {
                 value = calendar.getMaximum(Calendar.HOUR_OF_DAY) + 1;
             }
-            mRule.appendTo(buffer, value);
+            this.mRule.appendTo(buffer, value);
         }
 
         /**
          * {@inheritDoc}
          */
-        public void appendTo(StringBuffer buffer, int value) {
-            mRule.appendTo(buffer, value);
+        @Override
+		public void appendTo(StringBuffer buffer, int value) {
+            this.mRule.appendTo(buffer, value);
         }
     }
 
@@ -1537,27 +1577,28 @@ public class JapidDateFormat extends Format {
          * @param style the style
          */
         TimeZoneNameRule(TimeZone timeZone, boolean timeZoneForced, Locale locale, int style) {
-            mTimeZone = timeZone;
-            mTimeZoneForced = timeZoneForced;
-            mLocale = locale;
-            mStyle = style;
+            this.mTimeZone = timeZone;
+            this.mTimeZoneForced = timeZoneForced;
+            this.mLocale = locale;
+            this.mStyle = style;
 
             if (timeZoneForced) {
-                mStandard = getTimeZoneDisplay(timeZone, false, style, locale);
-                mDaylight = getTimeZoneDisplay(timeZone, true, style, locale);
+                this.mStandard = getTimeZoneDisplay(timeZone, false, style, locale);
+                this.mDaylight = getTimeZoneDisplay(timeZone, true, style, locale);
             } else {
-                mStandard = null;
-                mDaylight = null;
+                this.mStandard = null;
+                this.mDaylight = null;
             }
         }
 
         /**
          * {@inheritDoc}
          */
-        public int estimateLength() {
-            if (mTimeZoneForced) {
-                return Math.max(mStandard.length(), mDaylight.length());
-            } else if (mStyle == TimeZone.SHORT) {
+        @Override
+		public int estimateLength() {
+            if (this.mTimeZoneForced) {
+                return Math.max(this.mStandard.length(), this.mDaylight.length());
+            } else if (this.mStyle == TimeZone.SHORT) {
                 return 4;
             } else {
                 return 40;
@@ -1567,19 +1608,20 @@ public class JapidDateFormat extends Format {
         /**
          * {@inheritDoc}
          */
-        public void appendTo(StringBuffer buffer, Calendar calendar) {
-            if (mTimeZoneForced) {
-                if (mTimeZone.useDaylightTime() && calendar.get(Calendar.DST_OFFSET) != 0) {
-                    buffer.append(mDaylight);
+        @Override
+		public void appendTo(StringBuffer buffer, Calendar calendar) {
+            if (this.mTimeZoneForced) {
+                if (this.mTimeZone.useDaylightTime() && calendar.get(Calendar.DST_OFFSET) != 0) {
+                    buffer.append(this.mDaylight);
                 } else {
-                    buffer.append(mStandard);
+                    buffer.append(this.mStandard);
                 }
             } else {
                 TimeZone timeZone = calendar.getTimeZone();
                 if (timeZone.useDaylightTime() && calendar.get(Calendar.DST_OFFSET) != 0) {
-                    buffer.append(getTimeZoneDisplay(timeZone, true, mStyle, mLocale));
+                    buffer.append(getTimeZoneDisplay(timeZone, true, this.mStyle, this.mLocale));
                 } else {
-                    buffer.append(getTimeZoneDisplay(timeZone, false, mStyle, mLocale));
+                    buffer.append(getTimeZoneDisplay(timeZone, false, this.mStyle, this.mLocale));
                 }
             }
         }
@@ -1601,20 +1643,22 @@ public class JapidDateFormat extends Format {
          * @param colon add colon between HH and MM in the output if <code>true</code>
          */
         TimeZoneNumberRule(boolean colon) {
-            mColon = colon;
+            this.mColon = colon;
         }
 
         /**
          * {@inheritDoc}
          */
-        public int estimateLength() {
+        @Override
+		public int estimateLength() {
             return 5;
         }
 
         /**
          * {@inheritDoc}
          */
-        public void appendTo(StringBuffer buffer, Calendar calendar) {
+        @Override
+		public void appendTo(StringBuffer buffer, Calendar calendar) {
             int offset = calendar.get(Calendar.ZONE_OFFSET) + calendar.get(Calendar.DST_OFFSET);
             
             if (offset < 0) {
@@ -1628,7 +1672,7 @@ public class JapidDateFormat extends Format {
             buffer.append((char)(hours / 10 + '0'));
             buffer.append((char)(hours % 10 + '0'));
             
-            if (mColon) {
+            if (this.mColon) {
                 buffer.append(':');
             }
             
@@ -1655,36 +1699,38 @@ public class JapidDateFormat extends Format {
          * @param style the timezone style
          * @param locale the timezone locale
          */
-        TimeZoneDisplayKey(TimeZone timeZone,
-                           boolean daylight, int style, Locale locale) {
-            mTimeZone = timeZone;
+        TimeZoneDisplayKey(TimeZone timeZone, boolean daylight, int _style, Locale locale) {
+        	int style = _style;
+            this.mTimeZone = timeZone;
             if (daylight) {
                 style |= 0x80000000;
             }
-            mStyle = style;
-            mLocale = locale;
+            this.mStyle = style;
+            this.mLocale = locale;
         }
 
         /**
          * {@inheritDoc}
          */
-        public int hashCode() {
-            return mStyle * 31 + mLocale.hashCode();
+        @Override
+		public int hashCode() {
+            return this.mStyle * 31 + this.mLocale.hashCode();
         }
 
         /**
          * {@inheritDoc}
          */
-        public boolean equals(Object obj) {
+        @Override
+		public boolean equals(Object obj) {
             if (this == obj) {
                 return true;
             }
             if (obj instanceof TimeZoneDisplayKey) {
                 TimeZoneDisplayKey other = (TimeZoneDisplayKey)obj;
                 return
-                    mTimeZone.equals(other.mTimeZone) &&
-                    mStyle == other.mStyle &&
-                    mLocale.equals(other.mLocale);
+                    this.mTimeZone.equals(other.mTimeZone) &&
+                    this.mStyle == other.mStyle &&
+                    this.mLocale.equals(other.mLocale);
             }
             return false;
         }
@@ -1707,14 +1753,15 @@ public class JapidDateFormat extends Format {
          * @param obj2 second object in the pair
          */
         public Pair(Object obj1, Object obj2) {
-            mObj1 = obj1;
-            mObj2 = obj2;
+            this.mObj1 = obj1;
+            this.mObj2 = obj2;
         }
 
         /**
          * {@inheritDoc}
          */
-        public boolean equals(Object obj) {
+        @Override
+		public boolean equals(Object obj) {
             if (this == obj) {
                 return true;
             }
@@ -1726,26 +1773,28 @@ public class JapidDateFormat extends Format {
             Pair key = (Pair)obj;
 
             return
-                (mObj1 == null ?
-                 key.mObj1 == null : mObj1.equals(key.mObj1)) &&
-                (mObj2 == null ?
-                 key.mObj2 == null : mObj2.equals(key.mObj2));
+                (this.mObj1 == null ?
+                 key.mObj1 == null : this.mObj1.equals(key.mObj1)) &&
+                (this.mObj2 == null ?
+                 key.mObj2 == null : this.mObj2.equals(key.mObj2));
         }
 
         /**
          * {@inheritDoc}
          */
-        public int hashCode() {
+        @Override
+		public int hashCode() {
             return
-                (mObj1 == null ? 0 : mObj1.hashCode()) +
-                (mObj2 == null ? 0 : mObj2.hashCode());
+                (this.mObj1 == null ? 0 : this.mObj1.hashCode()) +
+                (this.mObj2 == null ? 0 : this.mObj2.hashCode());
         }
 
         /**
          * {@inheritDoc}
          */
-        public String toString() {
-            return "[" + mObj1 + ':' + mObj2 + ']';
+        @Override
+		public String toString() {
+            return "[" + this.mObj1 + ':' + this.mObj2 + ']';
         }
     }
 

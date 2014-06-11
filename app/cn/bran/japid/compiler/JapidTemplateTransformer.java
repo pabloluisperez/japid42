@@ -13,9 +13,7 @@
  */
 package cn.bran.japid.compiler;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.regex.Pattern;
@@ -44,22 +42,22 @@ public class JapidTemplateTransformer {
 	// private UrlMapper urlMapper;
 
 	/**
-	 * @param sourceFolder
+	 * @param _sourceFolder
 	 *            the folder containing the template source tree. It's the same
 	 *            concept as in eclipse. The root package for Java artifacts are
 	 *            the direct children of this
-	 * @param targetFolder
+	 * @param _targetFolder
 	 *            the "source folder", in Eclipse term, that the generated Java
 	 *            artifacts will be placed. If it is null, the Java files will
 	 *            be placed in the sourceFolder.
 	 */
-	public JapidTemplateTransformer(String sourceFolder, String targetFolder) {
+	public JapidTemplateTransformer(String _sourceFolder, String _targetFolder) {
 		super();
 
-		this.sourceFolder = sourceFolder;
+		this.sourceFolder = _sourceFolder;
 		// this.messageProvider = messageProvider;
 		// this.urlMapper = urlMapper;
-		this.targetFolder = targetFolder;
+		this.targetFolder = _targetFolder;
 		//		
 		// BranTemplateBase.messageProvider = messageProvider;
 		// BranTemplateBase.urlMapper = urlMapper;
@@ -115,17 +113,17 @@ public class JapidTemplateTransformer {
 	 * @throws Exception
 	 */
 	public File generate(String fileName) throws Exception {
-		String realSrcFile = sourceFolder == null ? fileName : sourceFolder + "/" + fileName;
+		String realSrcFile = this.sourceFolder == null ? fileName : this.sourceFolder + "/" + fileName;
 		String src = DirUtil.readFileAsString(realSrcFile);
 		JapidTemplate temp = new JapidTemplate(fileName, src);
 		JapidAbstractCompiler c = selectCompiler(src);
-		c.setUseWithPlay(usePlay);
+		c.setUseWithPlay(this.usePlay);
 		c.compile(temp);
 		String jsrc = temp.javaSource;
 
 		String fileNameRoot = DirUtil.mapSrcToJava(fileName);
 
-		String target = targetFolder == null ? sourceFolder : targetFolder;
+		String target = this.targetFolder == null ? this.sourceFolder : this.targetFolder;
 		String realTargetFile = target == null ? fileNameRoot : target + "/" + fileNameRoot;
 
 		File f = DirUtil.writeToFile(jsrc, realTargetFile);

@@ -26,35 +26,35 @@ public class JapidTemplate {
 
 	/**
 	 * 
-	 * @param name
+	 * @param _name
 	 *            the Japid script file name.  The name should start from the package root and the
 	 *            path to the file will be used as the package name and the file
 	 *            name as the class name. e.g.: a/b/c.html, a/b/c.xml. 
-	 * @param source
+	 * @param _source
 	 *            the source of the template
 	 */
-    public JapidTemplate(String name, String source) {
-        this.name = name;
-        this.source = source;
+    public JapidTemplate(String _name, String _source) {
+        this.name = _name;
+        this.source = _source;
         parseFullyQualifiedName();
     }
 
-    public JapidTemplate(String fqName, MimeTypeEnum mimeType, String source) {
+    public JapidTemplate(String fqName, MimeTypeEnum mimeType, String _source) {
     	if (!fqName.startsWith("japidviews."))
     		throw new RuntimeException("Japid script was not registered with a fully qualified class name starting with \"japidviews.\":  " + fqName);
     	this.name = fqName;
-    	this.source = source;
+    	this.source = _source;
     	int lastDot = fqName.lastIndexOf('.');
     	if (lastDot >= 0) {
-			packageName = fqName.substring(0, lastDot);
-			className = fqName.substring(lastDot + 1);
+			this.packageName = fqName.substring(0, lastDot);
+			this.className = fqName.substring(lastDot + 1);
     	}
     	else {
-    		packageName = "";
-    		className = fqName;
+    		this.packageName = "";
+    		this.className = fqName;
     	}
     	if (mimeType != null) {
-    		contentTypeHeader = mimeType.header;
+    		this.contentTypeHeader = mimeType.header;
     	}
     }
 
@@ -62,8 +62,8 @@ public class JapidTemplate {
 	 * @author Bing Ran (bing.ran@hotmail.com)
 	 */
 	private void parseFullyQualifiedName() {
-		String tempName = name.replace("-", "_");// .replace('.', '_');
-		contentTypeHeader = MimeTypeEnum.getHeader(tempName.substring(tempName.lastIndexOf('.')));
+		String tempName = this.name.replace("-", "_");// .replace('.', '_');
+		this.contentTypeHeader = MimeTypeEnum.getHeader(tempName.substring(tempName.lastIndexOf('.')));
 		tempName = DirUtil.mapSrcToJava(tempName);
 		tempName = tempName.substring(0, tempName.lastIndexOf(".java"));
 		tempName = tempName.replace('\\', '/');
@@ -77,17 +77,17 @@ public class JapidTemplate {
 			path = path.replace('\\', '.');
 			if (path.startsWith("."))
 				path = path.substring(1);
-			packageName = path;
-			className = tempName.substring(lastSep + 1);
+			this.packageName = path;
+			this.className = tempName.substring(lastSep + 1);
 		} else {
-			className = tempName;
+			this.className = tempName;
 		}
 		
 	}
 
-	public JapidTemplate(String source) {
+	public JapidTemplate(String _source) {
         this.name = UUID.randomUUID().toString();
-        this.source = source;
+        this.source = _source;
     }
     public String javaSource;
     public Class<JapidTemplateBaseWithoutPlay> compiledTemplate;

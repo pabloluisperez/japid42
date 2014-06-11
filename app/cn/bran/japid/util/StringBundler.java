@@ -38,7 +38,7 @@ import java.io.Writer;
 public class StringBundler {
 
 	public StringBundler() {
-		_array = new String[_DEFAULT_ARRAY_CAPACITY];
+		this._array = new String[_DEFAULT_ARRAY_CAPACITY];
 	}
 
 	public StringBundler(int initialCapacity) {
@@ -46,23 +46,22 @@ public class StringBundler {
 			throw new IllegalArgumentException();
 		}
 
-		_array = new String[initialCapacity];
+		this._array = new String[initialCapacity];
 	}
 
 	public StringBundler(String s) {
-		_array = new String[_DEFAULT_ARRAY_CAPACITY];
+		this._array = new String[_DEFAULT_ARRAY_CAPACITY];
 
-		_array[0] = s;
+		this._array[0] = s;
 
-		_arrayIndex = 1;
+		this._arrayIndex = 1;
 	}
 
 	public StringBundler append(boolean b) {
 		if (b) {
 			return append(_TRUE);
-		} else {
-			return append(_FALSE);
 		}
+		return append(_FALSE);
 	}
 
 	public StringBundler append(double d) {
@@ -92,21 +91,21 @@ public class StringBundler {
 			// s = "null";
 		}
 
-		if (_arrayIndex >= _array.length) {
+		if (this._arrayIndex >= this._array.length) {
 			expandCapacity();
 		}
 
-		_array[_arrayIndex++] = s;
+		this._array[this._arrayIndex++] = s;
 
 		return this;
 	}
 
 	public int capacity() {
-		return _array.length;
+		return this._array.length;
 	}
 
 	public int index() {
-		return _arrayIndex;
+		return this._arrayIndex;
 	}
 
 	public void setIndex(int newIndex) {
@@ -114,61 +113,62 @@ public class StringBundler {
 			throw new ArrayIndexOutOfBoundsException(newIndex);
 		}
 
-		if (newIndex > _array.length) {
+		if (newIndex > this._array.length) {
 			String[] newArray = new String[newIndex];
 
-			System.arraycopy(_array, 0, newArray, 0, _arrayIndex);
+			System.arraycopy(this._array, 0, newArray, 0, this._arrayIndex);
 
-			_array = newArray;
+			this._array = newArray;
 		}
 
-		if (_arrayIndex < newIndex) {
-			for (int i = _arrayIndex; i < newIndex; i++) {
-				_array[i] = "";
+		if (this._arrayIndex < newIndex) {
+			for (int i = this._arrayIndex; i < newIndex; i++) {
+				this._array[i] = "";
 			}
 		}
 
-		if (_arrayIndex > newIndex) {
-			for (int i = newIndex; i < _arrayIndex; i++) {
-				_array[i] = null;
+		if (this._arrayIndex > newIndex) {
+			for (int i = newIndex; i < this._arrayIndex; i++) {
+				this._array[i] = null;
 			}
 		}
 
-		_arrayIndex = newIndex;
+		this._arrayIndex = newIndex;
 	}
 
 	public String stringAt(int index) {
-		if (index >= _arrayIndex) {
+		if (index >= this._arrayIndex) {
 			throw new ArrayIndexOutOfBoundsException();
 		}
 
-		return _array[index];
+		return this._array[index];
 	}
 
+	@Override
 	public String toString() {
-		if (_arrayIndex == 0) {
+		if (this._arrayIndex == 0) {
 			return "";
 		}
 
 		String s = null;
 
-		if (_arrayIndex <= 3) {
-			s = _array[0];
+		if (this._arrayIndex <= 3) {
+			s = this._array[0];
 
-			for (int i = 1; i < _arrayIndex; i++) {
-				s = s.concat(_array[i]);
+			for (int i = 1; i < this._arrayIndex; i++) {
+				s = s.concat(this._array[i]);
 			}
 		} else {
 			int length = 0;
 
-			for (int i = 0; i < _arrayIndex; i++) {
-				length += _array[i].length();
+			for (int i = 0; i < this._arrayIndex; i++) {
+				length += this._array[i].length();
 			}
 
 			StringBuilder sb = new StringBuilder(length);
 
-			for (int i = 0; i < _arrayIndex; i++) {
-				sb.append(_array[i]);
+			for (int i = 0; i < this._arrayIndex; i++) {
+				sb.append(this._array[i]);
 			}
 
 			s = sb.toString();
@@ -178,21 +178,21 @@ public class StringBundler {
 	}
 
 	public void print(Writer w) throws IOException {
-		if (_arrayIndex == 0) {
+		if (this._arrayIndex == 0) {
 			return;
 		}
 
-		for (int i = 0; i < _arrayIndex; i++) {
-			w.write(_array[i]);
+		for (int i = 0; i < this._arrayIndex; i++) {
+			w.write(this._array[i]);
 		}
 	}
 
 	protected void expandCapacity() {
-		String[] newArray = new String[_array.length << 1];
+		String[] newArray = new String[this._array.length << 1];
 
-		System.arraycopy(_array, 0, newArray, 0, _arrayIndex);
+		System.arraycopy(this._array, 0, newArray, 0, this._arrayIndex);
 
-		_array = newArray;
+		this._array = newArray;
 	}
 
 	private static final int _DEFAULT_ARRAY_CAPACITY = 16;

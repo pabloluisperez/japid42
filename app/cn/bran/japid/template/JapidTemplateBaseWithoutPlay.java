@@ -19,31 +19,22 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import cn.bran.japid.MyTuple2;
-import cn.bran.japid.tags.Each;
+import cn.bran.japid.classmeta.MimeTypeEnum;
+import cn.bran.japid.compiler.NamedArgRuntime;
 import cn.bran.japid.tags.Each.BreakLoop;
 import cn.bran.japid.tags.Each.ContinueLoop;
-import cn.bran.japid.util.StringUtils;
-
-import cn.bran.japid.classmeta.MimeTypeEnum;
-import cn.bran.japid.compiler.NamedArg;
-import cn.bran.japid.compiler.NamedArgRuntime;
 import cn.bran.japid.util.HTMLUtils;
-import cn.bran.japid.util.JapidFlags;
+import cn.bran.japid.util.StringUtils;
 import cn.bran.japid.util.WebUtils;
 
 /**
@@ -75,24 +66,24 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 	public List<MyTuple2<String, Long>> timeLogs;
 	
 	private void init() {
-		if (headers == null) {
-			 headers = new TreeMap<String, String>();
+		if (this.headers == null) {
+			 this.headers = new TreeMap<String, String>();
 //			 headers = new HashMap<String, String>();
-			 headers.put("Content-Type", "text/html; charset=utf-8");
+			 this.headers.put("Content-Type", "text/html; charset=utf-8");
 		}
-		if (timeLogs == null) {
-			timeLogs = new LinkedList<MyTuple2<String, Long>>();
+		if (this.timeLogs == null) {
+			this.timeLogs = new LinkedList<MyTuple2<String, Long>>();
 		}
-		if (out == null)
-			out = new StringBuilder(4000);
+		if (this.out == null)
+			this.out = new StringBuilder(4000);
 	}
 
-	public void setOut(StringBuilder out) {
-		this.out = out;
+	public void setOut(StringBuilder _out) {
+		this.out = _out;
 	}
 
 	protected StringBuilder getOut() {
-		return out;
+		return this.out;
 	}
 
 	// public JapidTemplateBase() {
@@ -100,7 +91,7 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 	// };
 
 	protected void putHeader(String k, String v) {
-		headers.put(k, v);
+		this.headers.put(k, v);
 	}
 
 	protected Map<String, String> getHeaders() {
@@ -112,14 +103,14 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 		init();
 	}
 
-	public JapidTemplateBaseWithoutPlay(JapidTemplateBaseWithoutPlay caller) {
-		if (caller != null) {
-			out = caller.getOut();
+	public JapidTemplateBaseWithoutPlay(JapidTemplateBaseWithoutPlay _caller) {
+		if (_caller != null) {
+			this.out = _caller.getOut();
 		}
-		this.caller = caller;
-		this.timeLogs = caller.timeLogs;
-		this.headers = caller.getHeaders();
-		this.stopwatch = caller.stopwatch;
+		this.caller = _caller;
+		this.timeLogs = _caller.timeLogs;
+		this.headers = _caller.getHeaders();
+		this.stopwatch = _caller.stopwatch;
 		init();
 	}
 
@@ -128,17 +119,17 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 
 	final protected void p(String s) {
 		if (s != null && !s.isEmpty())
-			out.append(s);
+			this.out.append(s);
 
 //		writeString(s);
 	}
 
 	final protected void pln(String s) {
 		if (s != null && !s.isEmpty())
-			out.append(s);
+			this.out.append(s);
 
 //		writeString(s);
-		out.append('\n');
+		this.out.append('\n');
 	}
 
 	/**
@@ -151,7 +142,7 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 		// out.write(bb.array(), 0, bb.position());
 		// ok my code is slower in large trunk of data
 		if (s != null && !s.isEmpty())
-			out.append(s);
+			this.out.append(s);
 	}
 
 	// final protected void pln(byte[] ba) {
@@ -177,7 +168,7 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 	}
 
 	final protected void pln() {
-		out.append('\n');
+		this.out.append('\n');
 	}
 
 	/**
@@ -308,12 +299,12 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 	public boolean hasDoBody = false;
 
 	protected void setHasDoBody() {
-		hasDoBody = true;
+		this.hasDoBody = true;
 	}
 
 	protected void setRenderMethod(Method renderMethod) {
 		// System.out.println("-> setrender name: " + renderMethod);
-		renderMethodInstance = renderMethod;
+		this.renderMethodInstance = renderMethod;
 	}
 
 	public String[] argNamesInstance = null;
@@ -366,7 +357,7 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 
 	public cn.bran.japid.template.RenderResult render(NamedArgRuntime... named) {
 		Object[] args = null;
-		if (hasDoBody) // called without the callback block
+		if (this.hasDoBody) // called without the callback block
 			args = buildArgs(named, null);
 		else
 			args = buildArgs(named);
@@ -379,7 +370,7 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 	 */
 	protected cn.bran.japid.template.RenderResult runRenderer(Object[] args) {
 		try {
-			return (cn.bran.japid.template.RenderResult) renderMethodInstance.invoke(this, args);
+			return (cn.bran.japid.template.RenderResult) this.renderMethodInstance.invoke(this, args);
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {
@@ -403,10 +394,10 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 			map.put(na.name, na.val);
 		}
 
-		Object[] ret = new Object[argNamesInstance.length];
+		Object[] ret = new Object[this.argNamesInstance.length];
 
-		for (int i = 0; i < argNamesInstance.length; i++) {
-			String name = argNamesInstance[i];
+		for (int i = 0; i < this.argNamesInstance.length; i++) {
+			String name = this.argNamesInstance[i];
 			if (map.containsKey(name)) {
 				ret[i] = map.remove(name);
 			} else {
@@ -417,7 +408,7 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 				else {
 					// set default value for primitives and Strings, or null for
 					// complex object
-					String type = argTypesInstance[i];
+					String type = this.argTypesInstance[i];
 					Object defaultVal = getDefaultValForType(type);
 					ret[i] = defaultVal;
 				}
@@ -427,7 +418,7 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 			Set<String> keys = map.keySet();
 			String sep = ", ";
 			String ks = "[" + StringUtils.join(keys, sep) + "]";
-			String vs = "[" + StringUtils.join(argNamesInstance, sep) + "]";
+			String vs = "[" + StringUtils.join(this.argNamesInstance, sep) + "]";
 			throw new RuntimeException("One or more argument names are not valid: " + ks
 					+ ". Valid argument names are: " + vs);
 		}
@@ -493,10 +484,10 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 	 * @return
 	 */
 	protected String makeBeginBorder(String viewSource) {
-		if (StringUtils.isEmpty(contentType))
+		if (StringUtils.isEmpty(this.contentType))
 			return null;
 
-		String formatter = getContentCommentFormatter(contentType);
+		String formatter = getContentCommentFormatter(this.contentType);
 		if (formatter == null)
 			return "";
 
@@ -509,17 +500,17 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 	 * @return
 	 */
 	protected String makeEndBorder(String viewSource) {
-		if (StringUtils.isEmpty(contentType))
+		if (StringUtils.isEmpty(this.contentType))
 			return null;
 
-		String formatter = getContentCommentFormatter(contentType);
+		String formatter = getContentCommentFormatter(this.contentType);
 		if (formatter == null)
 			return "";
 
 		String content = "exit: \"" + viewSource + "\"";
 		if (shouldRecordTime()) {
 			// add time consumption to the endline for debugging purpose
-			content += ". Duration/μs: " + renderingTime;
+			content += ". Duration/μs: " + this.renderingTime;
 		}
 
 		return String.format(formatter, content);
@@ -534,8 +525,8 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 	 * @return
 	 */
 	private boolean shouldTraceFile() {
-		if (traceFile != null)
-			return traceFile;
+		if (this.traceFile != null)
+			return this.traceFile;
 		else if (this.mimeType == MimeTypeEnum.xml || this.mimeType == MimeTypeEnum.html)
 			if (globalTraceFileHtml != null)
 				return globalTraceFileHtml;
@@ -574,19 +565,19 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 	protected void endDoLayout(String viewSource) {
 		if (shouldRecordTime()) {
 			calcDuration();
-			logTime(sourceTemplate, renderingTime);
+			logTime(this.sourceTemplate, this.renderingTime);
 		}
 
 		if (shouldTraceFile())
 			p(makeEndBorder(viewSource));
-		else if (traceFileExit != null && traceFileExit)
+		else if (this.traceFileExit != null && this.traceFileExit)
 			p(makeEndBorder(viewSource));
 
 	}
 
 	private void calcDuration() {
-		long duration = System.nanoTime() - startTime;
-		renderingTime = duration / 1000;
+		long duration = System.nanoTime() - this.startTime;
+		this.renderingTime = duration / 1000;
 
 //		JapidFlags._log("Time consumed to render \"" + sourceTemplate + "\": " + renderingTime + " μs");
 	}
@@ -605,24 +596,24 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 	 * @return the contentType
 	 */
 	public String getContentType() {
-		return contentType;
+		return this.contentType;
 	}
 
 	/**
-	 * @param contentType
+	 * @param _contentType
 	 *            the contentType to set
 	 */
-	public void setContentType(String contentType) {
-		this.contentType = contentType;
-		if (contentType.contains("xml"))
+	public void setContentType(String _contentType) {
+		this.contentType = _contentType;
+		if (_contentType.contains("xml"))
 			this.mimeType = MimeTypeEnum.xml;
-		else if (contentType.contains("html"))
+		else if (_contentType.contains("html"))
 			this.mimeType = MimeTypeEnum.html;
-		else if (contentType.contains("javascript"))
+		else if (_contentType.contains("javascript"))
 			this.mimeType = MimeTypeEnum.js;
-		else if (contentType.contains("json"))
+		else if (_contentType.contains("json"))
 			this.mimeType = MimeTypeEnum.json;
-		else if (contentType.contains("css"))
+		else if (_contentType.contains("css"))
 			this.mimeType = MimeTypeEnum.css;
 	}
 
@@ -630,15 +621,15 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 	 * @return the traceFile
 	 */
 	public Boolean getTraceFile() {
-		return traceFile;
+		return this.traceFile;
 	}
 
 	/**
-	 * @param traceFile
+	 * @param _traceFile
 	 *            the traceFile to set
 	 */
-	public void setTraceFile(Boolean traceFile) {
-		this.traceFile = traceFile;
+	public void setTraceFile(Boolean _traceFile) {
+		this.traceFile = _traceFile;
 	}
 
 	/**
@@ -678,7 +669,7 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 	}
 
 	public boolean isStopwatch() {
-		return stopwatch != null ? stopwatch : false;
+		return this.stopwatch != null ? this.stopwatch : false;
 	}
 
 	public void setStopwatchOn() {
@@ -694,7 +685,7 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 //	}
 
 	protected cn.bran.japid.template.RenderResult getRenderResult() {
-		return new cn.bran.japid.template.RenderResult(getHeaders(), getOut(), renderingTime);
+		return new cn.bran.japid.template.RenderResult(getHeaders(), getOut(), this.renderingTime);
 	}
 
 	/**
@@ -705,7 +696,7 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 	protected void logDuration(String marker) {
 		if (shouldRecordTime()) {
 			long endtime = System.nanoTime();
-			long duration = endtime - startTime;
+			long duration = endtime - this.startTime;
 			long t = duration / 1000;
 
 			logTime(marker, t);
@@ -723,7 +714,7 @@ public abstract class JapidTemplateBaseWithoutPlay implements Serializable {
 //		if (caller != null) {
 //			caller.logTime(marker, t);
 //		} else {
-			timeLogs.add(new MyTuple2(marker, t));
+			this.timeLogs.add(new MyTuple2(marker, t));
 //		}
 	}
 }

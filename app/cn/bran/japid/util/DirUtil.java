@@ -33,7 +33,8 @@ public class DirUtil {
 	private static final String[] ALL_EXTS = new String[] { ".java", ".html", ".js", ".txt", ".css", ".json", ".xml" };
 	private static final String[] TEMPLATE_EXTS = new String[] { ".html", ".js", ".txt", ".css", ".xml", ".json" };
 
-	public static Set<File> findOrphanJava(File src, File target) {
+	public static Set<File> findOrphanJava(File src, File _target) {
+		File target = _target;
 		if (target == null)
 			target = src;
 		String[] allSrc = getAllFileNames(src, ALL_EXTS);
@@ -349,7 +350,8 @@ public class DirUtil {
 		return rawConvert(k);// .replaceAll(DOT_SUB, ".");
 	}
 
-	private static String rawConvert(String k) {
+	private static String rawConvert(String _k) {
+		String k = _k;
 		if (k.endsWith(".java"))
 			k = k.substring(0, k.lastIndexOf(".java"));
 
@@ -408,12 +410,12 @@ public class DirUtil {
 
 		if (dir.exists()) {
 			String[] temps = getAllFileNames(dir, ALL_EXTS);
-			if (temps.length > 0)
+			if (temps.length > 0){
 				return true;
-			else
-				return false;
-		} else
+			}
 			return false;
+		}
+		return false;
 	}
 
 	// public static boolean hasTags(String root) {
@@ -583,7 +585,8 @@ public class DirUtil {
 	 * @param japidScriptFileName
 	 * @return
 	 */
-	public static String deriveClassName(String japidScriptFileName) {
+	public static String deriveClassName(String _japidScriptFileName) {
+		String japidScriptFileName = _japidScriptFileName;
 		// remove the leading slash
 		if (japidScriptFileName.startsWith("/") || japidScriptFileName.startsWith("\\"))
 			japidScriptFileName = japidScriptFileName.substring(1);

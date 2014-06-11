@@ -1,6 +1,5 @@
 package cn.bran.play;
 
-import cn.bran.japid.template.RenderResult;
 
 /**
  * to indicate the item in cache will expire soon and should be updated now
@@ -10,8 +9,8 @@ import cn.bran.japid.template.RenderResult;
  */
 public class ShouldRefreshException extends Exception {
 	public CachedRenderResult renderResult;
-	public ShouldRefreshException(CachedRenderResult renderResult) {
-		this.renderResult= renderResult;
+	public ShouldRefreshException(CachedRenderResult _renderResult) {
+		this.renderResult= _renderResult;
 	}
 
 }

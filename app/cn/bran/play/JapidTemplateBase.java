@@ -39,15 +39,15 @@ public abstract class JapidTemplateBase extends JapidTemplateBaseWithoutPlay {
 	 * @author Bing Ran (bing.ran@gmail.com)
 	 */
 	private void initme() {
-		if (actionRunners == null) {
-			actionRunners = new TreeMap<Integer, cn.bran.japid.template.ActionRunner>();
+		if (this.actionRunners == null) {
+			this.actionRunners = new TreeMap<Integer, cn.bran.japid.template.ActionRunner>();
 		}
 	}
 
-	public JapidTemplateBase(JapidTemplateBaseWithoutPlay caller) {
-		super(caller);
-		if (caller instanceof JapidTemplateBase){
-			setActionRunners(((JapidTemplateBase)caller).getActionRunners());
+	public JapidTemplateBase(JapidTemplateBaseWithoutPlay _caller) {
+		super(_caller);
+		if (_caller instanceof JapidTemplateBase){
+			setActionRunners(((JapidTemplateBase)_caller).getActionRunners());
 		}
 		initme();
 	}
@@ -58,17 +58,18 @@ public abstract class JapidTemplateBase extends JapidTemplateBaseWithoutPlay {
 	protected TreeMap<Integer, cn.bran.japid.template.ActionRunner> actionRunners;// = new TreeMap<Integer, cn.bran.japid.template.ActionRunner>();
 
 	public TreeMap<Integer, cn.bran.japid.template.ActionRunner> getActionRunners() {
-		return actionRunners;
+		return this.actionRunners;
 	}
 
 	public JapidTemplateBaseWithoutPlay setActionRunners(
-			TreeMap<Integer, cn.bran.japid.template.ActionRunner> actionRunners) {
-		this.actionRunners = actionRunners;
+			TreeMap<Integer, cn.bran.japid.template.ActionRunner> _actionRunners) {
+		this.actionRunners = _actionRunners;
 		return this;
 	}
 
+	@Override
 	protected cn.bran.japid.template.RenderResult getRenderResult() {
-		return new cn.bran.japid.template.RenderResultPartial(getHeaders(), getOut(), renderingTime, actionRunners, sourceTemplate);
+		return new cn.bran.japid.template.RenderResultPartial(getHeaders(), getOut(), this.renderingTime, this.actionRunners, this.sourceTemplate);
 	}
 
 }

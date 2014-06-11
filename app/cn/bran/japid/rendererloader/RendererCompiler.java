@@ -65,7 +65,7 @@ public class RendererCompiler {
 		settings.put(OPTION_TargetPlatform, javaVersion);
 		settings.put(OPTION_PreserveUnusedLocal, PRESERVE);
 		settings.put(OPTION_Compliance, javaVersion);
-		jdtCompiler = new Compiler(
+		this.jdtCompiler = new Compiler(
 				new NameEnv(cl), 
 				DefaultErrorHandlingPolicies.exitOnFirstError(), 
 				settings, 
@@ -86,7 +86,7 @@ public class RendererCompiler {
 		}
 
 
-		jdtCompiler.compile(compilationUnits);
+		this.jdtCompiler.compile(compilationUnits);
 		JapidRenderer.persistJapidClassesLater();
 	}
 

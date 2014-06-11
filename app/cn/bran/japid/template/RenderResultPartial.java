@@ -25,18 +25,18 @@ public class RenderResultPartial extends RenderResult {
 	private String viewName;
 
 	public Map<Integer, ActionRunner> getActionRunners() {
-		return actionRunners;
+		return this.actionRunners;
 	}
 
-	public RenderResultPartial(Map<String, String> headers, StringBuilder content, long renderTime, Map<Integer, ActionRunner> actions) {
-		super(headers, content, renderTime);
+	public RenderResultPartial(Map<String, String> headers, StringBuilder content, long _renderTime, Map<Integer, ActionRunner> actions) {
+		super(headers, content, _renderTime);
 		this.actionRunners = actions;
 	}
 	
-	public RenderResultPartial(Map<String, String> headers, StringBuilder content, long renderTime, Map<Integer, ActionRunner> actions, String viewName) {
-		super(headers, content, renderTime);
+	public RenderResultPartial(Map<String, String> headers, StringBuilder content, long _renderTime, Map<Integer, ActionRunner> actions, String _viewName) {
+		super(headers, content, _renderTime);
 		this.actionRunners = actions;
-		this.viewName = viewName;
+		this.viewName = _viewName;
 	}
 	
 	public RenderResultPartial() {
@@ -47,9 +47,9 @@ public class RenderResultPartial extends RenderResult {
 		StringBuilder superContent = super.getContent();
 			
 		StringBuilder sb = new StringBuilder();
-		if (actionRunners != null && actionRunners.size() > 0) {
+		if (this.actionRunners != null && this.actionRunners.size() > 0) {
 			int segStart = 0;
-			for (Map.Entry<Integer, ActionRunner> arEntry : actionRunners.entrySet()) {
+			for (Map.Entry<Integer, ActionRunner> arEntry : this.actionRunners.entrySet()) {
 				int pos = arEntry.getKey();
 				sb.append(superContent.substring(segStart, pos));
 				segStart = pos;
@@ -68,13 +68,13 @@ public class RenderResultPartial extends RenderResult {
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
 		super.writeExternal(out);
-		out.writeObject(actionRunners);
+		out.writeObject(this.actionRunners);
 	}
 
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 		super.readExternal(in);
-		actionRunners = (Map<Integer, ActionRunner>) in.readObject();
+		this.actionRunners = (Map<Integer, ActionRunner>) in.readObject();
 	}
 
 	@Override

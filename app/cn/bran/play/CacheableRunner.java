@@ -1,15 +1,12 @@
 package cn.bran.play;
 
-import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.io.Serializable;
 
 import play.mvc.Controller;
 import play.mvc.Http.Context.Implicit;
 import play.mvc.Http.Request;
-
 import cn.bran.japid.template.ActionRunner;
 import cn.bran.japid.template.RenderResult;
 
@@ -84,7 +81,7 @@ public abstract class CacheableRunner extends ActionRunner /*implements External
 		} else {
 			// cache in work
 			RenderResult rr = null;
-			if (!readThru) {
+			if (!this.readThru) {
 				try {
 					rr = RenderResultCache.get(getKeyString());
 					if (rr != null)
@@ -107,7 +104,7 @@ public abstract class CacheableRunner extends ActionRunner /*implements External
 	 */
 	protected boolean shouldCache() {
 //		System.out.println("CacheableRunner: should cache: " + !noCache);
-		return !noCache;
+		return !this.noCache;
 	}
 
 	/**
@@ -115,7 +112,7 @@ public abstract class CacheableRunner extends ActionRunner /*implements External
 	 */
 	protected void cacheResult(RenderResult rr1) {
 //		System.out.println("CacheableRunner: put in cache");
-		RenderResultCache.set(getKeyString(), rr1, ttlAbs);
+		RenderResultCache.set(getKeyString(), rr1, this.ttlAbs);
 	}
 
 	/**
@@ -173,18 +170,18 @@ public abstract class CacheableRunner extends ActionRunner /*implements External
 			}
 
 	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeUTF(ttlAbs);
+		out.writeUTF(this.ttlAbs);
 		out.writeUTF(getKeyString());
-		out.writeBoolean(noCache);
-		out.writeBoolean(readThru);
+		out.writeBoolean(this.noCache);
+		out.writeBoolean(this.readThru);
 	}
 
 
-	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-		ttlAbs = in.readUTF();
+	public void readExternal(ObjectInput in) throws IOException {
+		this.ttlAbs = in.readUTF();
 		setKeyString(in.readUTF());
-		noCache = in.readBoolean();
-		readThru = in.readBoolean();
+		this.noCache = in.readBoolean();
+		this.readThru = in.readBoolean();
 		
 	}
 
@@ -192,14 +189,14 @@ public abstract class CacheableRunner extends ActionRunner /*implements External
 	 * @return the keyString
 	 */
 	public String getKeyString() {
-		return keyString;
+		return this.keyString;
 	}
 
 	/**
 	 * @param keyString the keyString to set
 	 */
-	public void setKeyString(String keyString) {
-		this.keyString = keyString;
+	public void setKeyString(String _keyString) {
+		this.keyString = _keyString;
 	}
 
 	/**

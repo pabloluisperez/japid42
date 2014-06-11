@@ -13,13 +13,13 @@ import cn.bran.japid.template.RenderResult;
 public class CachedRenderResult implements Serializable{
 	public CachedItemStatus status;
 	public RenderResult rr;
-	public CachedRenderResult(CachedItemStatus status, RenderResult rr) {
+	public CachedRenderResult(CachedItemStatus _status, RenderResult _rr) {
 		super();
-		this.status = status;
-		this.rr = rr;
+		this.status = _status;
+		this.rr = _rr;
 	}
 	public boolean isExpired() {
-		return status.isExpired();
+		return this.status.isExpired();
 	}
 	
 }

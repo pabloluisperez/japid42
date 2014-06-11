@@ -13,7 +13,7 @@ public abstract class JapidTemplateBaseWithStringBundler {
 	StringBundler out;
 	protected Map<String, String> headers = new TreeMap<String, String>();
 	{
-		headers.put("Content-Type", "text/html; charset=utf-8");
+		this.headers.put("Content-Type", "text/html; charset=utf-8");
 	}
 
 	/**
@@ -22,19 +22,19 @@ public abstract class JapidTemplateBaseWithStringBundler {
 	protected TreeMap<Integer, cn.bran.japid.template.ActionRunner> actionRunners = new TreeMap<Integer, cn.bran.japid.template.ActionRunner>();
 
 	public TreeMap<Integer, cn.bran.japid.template.ActionRunner> getActionRunners() {
-		return actionRunners;
+		return this.actionRunners;
 	}
 
-	public void setActionRunners(TreeMap<Integer, cn.bran.japid.template.ActionRunner> actionRunners) {
-		this.actionRunners = actionRunners;
+	public void setActionRunners(TreeMap<Integer, cn.bran.japid.template.ActionRunner> _actionRunners) {
+		this.actionRunners = _actionRunners;
 	}
 
-	public void setOut(StringBundler out) {
-		this.out = out;
+	public void setOut(StringBundler _out) {
+		this.out = _out;
 	}
 
 	protected StringBundler getOut() {
-		return out;
+		return this.out;
 	}
 	
 //	public JapidTemplateBase() {
@@ -54,7 +54,7 @@ public abstract class JapidTemplateBaseWithStringBundler {
 
 	final protected void pln(String s) {
 		writeString(s);
-		out.append('\n');
+		this.out.append('\n');
 	}
 
 	/**
@@ -67,7 +67,7 @@ public abstract class JapidTemplateBaseWithStringBundler {
 		// out.write(bb.array(), 0, bb.position());
 		// ok my code is slower in large trunk of data
 		if (s != null && !s.isEmpty())
-			out.append(s);
+			this.out.append(s);
 	}
 
 	// final protected void pln(byte[] ba) {
@@ -93,7 +93,7 @@ public abstract class JapidTemplateBaseWithStringBundler {
 	}
 
 	final protected void pln() {
-		out.append('\n');
+		this.out.append('\n');
 	}
 
 	/**

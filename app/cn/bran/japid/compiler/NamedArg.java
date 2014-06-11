@@ -10,17 +10,17 @@ import japa.parser.ast.expr.Expression;
  */
 public class NamedArg {
 	public NamedArg(Expression target, Expression value) {
-		name = target.toString(); 
-		valExpr = value.toString();
+		this.name = target.toString(); 
+		this.valExpr = value.toString();
 	}
 	public String name;
 	public String valExpr;
 	@Override
 	public String toString() {
-		return name + " = " + valExpr;
+		return this.name + " = " + this.valExpr;
 	}
 	public String toNamed() {
-		return "named(\"" + name + "\", " + valExpr + ")";
+		return "named(\"" + this.name + "\", " + this.valExpr + ")";
 	}
 	
 	

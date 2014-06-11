@@ -44,6 +44,7 @@ public class FlashWrapper implements FlashScope{
 		return this.success() != null;
 	}
 
+	@Override
 	public void putSuccess(String message) {
 		f().put(FlashScope.SUCCESS, message);
 	}

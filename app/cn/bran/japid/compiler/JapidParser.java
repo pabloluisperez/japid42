@@ -17,11 +17,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
-import java.util.regex.Pattern;
 
 /**
  * Template parser
@@ -36,18 +33,18 @@ public class JapidParser {
 	private static final String VERBATIM2 = "verbatim";
 	private String pageSource;
 
-	public JapidParser(String pageSource) {
+	public JapidParser(String _pageSource1) {
 		// hack: allow $[] string interpolation in String literals in script block. 
 		// see: https://github.com/branaway/Japid/issues/19
-		pageSource = pageSource.replaceAll(JapidParser.PLACE_HOLDER_PATTERN_S, JapidParser.SUB_PATTERN_S);
+		String _pageSource = _pageSource1.replaceAll(JapidParser.PLACE_HOLDER_PATTERN_S, JapidParser.SUB_PATTERN_S);
 
 		// detect marker
 		// the logic is to find the first line that starts with either ` or @
-		char mar = detectMarker(pageSource);
+		char mar = detectMarker(_pageSource);
 		setMarker(mar);
 
-		this.pageSource = pageSource;
-		this.len = pageSource.length();
+		this.pageSource = _pageSource;
+		this.len = _pageSource.length();
 		
 	}
 
@@ -79,13 +76,13 @@ public class JapidParser {
 	}
 
 	public void setMarker(char m) {
-		MARKER_CHAR = m;
-		MARKER_STRING = new String(new char[] { m });
+		this.MARKER_CHAR = m;
+		this.MARKER_STRING = new String(new char[] { m });
 	}
 
 	public void resetMarker() {
-		MARKER_CHAR = '`';
-		MARKER_STRING = new String(new char[] { MARKER_CHAR });
+		this.MARKER_CHAR = '`';
+		this.MARKER_STRING = new String(new char[] { this.MARKER_CHAR });
 	}
 
 	// bran:
@@ -142,31 +139,30 @@ public class JapidParser {
 	public static final String PLACE_HOLDER_PATTERN_S = "\\$\\[(.+?)\\]\\$"; // none-greedy match 
 
 	private JapidParser.Token found(JapidParser.Token newState, int skip) {
-		begin2 = begin;
-		end2 = --end;
-		begin = end += skip;
-		lastState = state == Token.EXPR_NATURAL ? Token.EXPR : state;
-		state = newState;
-		return lastState;
+		this.begin2 = this.begin;
+		this.end2 = --this.end;
+		this.begin = this.end += skip;
+		this.lastState = this.state == Token.EXPR_NATURAL ? Token.EXPR : this.state;
+		this.state = newState;
+		return this.lastState;
 	}
 
 	private void skip(int skip) {
-		end2 = --end;
-		end += skip;
+		this.end2 = --this.end;
+		this.end += skip;
 	}
 
 	public Integer getLineNumber() {
-		String token = pageSource.substring(0, begin2);
+		String token = this.pageSource.substring(0, this.begin2);
 		if (token.indexOf("\n") == -1) {
 			return 1;
-		} else {
-			return token.split("\n").length;
 		}
+		return token.split("\n").length;
 	}
 
 	public String getToken() {
-		String tokenString = pageSource.substring(begin2, end2);
-		if (lastState == Token.PLAIN) {
+		String tokenString = this.pageSource.substring(this.begin2, this.end2);
+		if (this.lastState == Token.PLAIN) {
 			// un-escape special sequence
 			tokenString = tokenString.replace("``", "`").replace("`@", "@");
 			tokenString = escapeSpecialWith(tokenString, '~');
@@ -233,10 +229,9 @@ public class JapidParser {
 						if (c2 == '\n') {
 							i ++; i++;
 							continue;
-						} else {
-							i++;
-							continue;
 						}
+						i++;
+						continue;
 					} else if (c1 == '\n') {
 						i++;
 						continue;
@@ -251,8 +246,8 @@ public class JapidParser {
 	}
 
 	public String checkNext() {
-		if (end2 < pageSource.length()) {
-			return pageSource.charAt(end2) + "";
+		if (this.end2 < this.pageSource.length()) {
+			return this.pageSource.charAt(this.end2) + "";
 		}
 		return "";
 	}
@@ -261,15 +256,15 @@ public class JapidParser {
 		for (;;) {
 
 			// how many more chars to be processed 
-			int left = len - end;
+			int left = this.len - this.end;
 			if (left == 0) {
-				end++;
+				this.end++;
 				return found(Token.EOF, 0);
 			}
 
-			char c = pageSource.charAt(end++);
-			char c1 = left > 1 ? pageSource.charAt(end) : 0;
-			char c2 = left > 2 ? pageSource.charAt(end + 1) : 0;
+			char c = this.pageSource.charAt(this.end++);
+			char c1 = left > 1 ? this.pageSource.charAt(this.end) : 0;
+			char c2 = left > 2 ? this.pageSource.charAt(this.end + 1) : 0;
 
 			// detect line continue sign
 			if (c == '\\') {
@@ -277,17 +272,16 @@ public class JapidParser {
 					if (c2 == '\n') {
 						skip(3);
 						continue;
-					} else {
-						skip(2);
-						continue;
 					}
+					skip(2);
+					continue;
 				} else if (c1 == '\n') {
 					skip(2);
 					continue;
 				}
 			}
 
-			switch (state) {
+			switch (this.state) {
 			case PLAIN:
 				if (c == '%' && c1 == '{') {
 					return found(Token.SCRIPT, 2);
@@ -372,8 +366,8 @@ public class JapidParser {
 						break;
 					}
 
-				if (c == MARKER_CHAR)
-					if (c1 == MARKER_CHAR) {
+				if (c == this.MARKER_CHAR)
+					if (c1 == this.MARKER_CHAR) {
 						skip(2);
 					} else if (c1 == '(') {
 						return found(Token.TEMPLATE_ARGS, 2);
@@ -417,10 +411,10 @@ public class JapidParser {
 				}
 				break;
 			case VERBATIM:
-				if (c == MARKER_CHAR) {
+				if (c == this.MARKER_CHAR) {
 					String currentLine = getCurrentLine();
-					if (currentLine.trim().equals(MARKER_STRING)) {
-						int skip = currentLine.length() - currentLine.indexOf(MARKER_CHAR);
+					if (currentLine.trim().equals(this.MARKER_STRING)) {
+						int skip = currentLine.length() - currentLine.indexOf(this.MARKER_CHAR);
 						return found(Token.PLAIN, skip);
 					}
 				}
@@ -433,7 +427,7 @@ public class JapidParser {
 						return found(Token.PLAIN, 1);
 				} else if (c == '\n') {
 					return found(Token.PLAIN, 1);
-				} else if (c == MARKER_CHAR) {
+				} else if (c == this.MARKER_CHAR) {
 					return found(Token.PLAIN, 1);
 				}
 				break;
@@ -571,7 +565,7 @@ public class JapidParser {
 				break;
 			case ACTION_CURLY:
 				if (c == '}') {
-					state = this.methodCallStackInExpr.pop();
+					this.state = this.methodCallStackInExpr.pop();
 					skip(1);
 				} else if (c == '{') {
 					skipAhead(Token.ACTION_CURLY, 1);
@@ -582,6 +576,12 @@ public class JapidParser {
 					return found(Token.PLAIN, 1);
 				}
 				break;
+			case EOF:
+				break;
+			case EXPR_WING:
+				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -591,11 +591,11 @@ public class JapidParser {
 	 * @return
 	 */
 	private String getCurrentPartialToken() {
-		return pageSource.substring(begin, end - 1);
+		return this.pageSource.substring(this.begin, this.end - 1);
 	}
 
 	private String getCurrentLine() {
-		return getCurrentLine(pageSource, end - 1);
+		return getCurrentLine(this.pageSource, this.end - 1);
 	}
 
 //	private boolean isStandAloneBackQuote() {
@@ -608,11 +608,11 @@ public class JapidParser {
 //	}
 //	
 	String getRestLine() {
-		return getRestLine(pageSource, end - 1);
+		return getRestLine(this.pageSource, this.end - 1);
 	}
 
 	String getRestLineIncludingLineBreaks() {
-		return getRestLineIncludingLineBreaks(pageSource, end - 1);
+		return getRestLineIncludingLineBreaks(this.pageSource, this.end - 1);
 	}
 	/**
 	 * get the rest of the current line 
@@ -700,9 +700,9 @@ public class JapidParser {
 	private boolean nextMatch(String s) {
 		for (int i = 0; i < s.length(); i++) {
 			char c = s.charAt(i);
-			int index = end + i;
-			if (index < pageSource.length()) {
-				if (c != pageSource.charAt(index)) {
+			int index = this.end + i;
+			if (index < this.pageSource.length()) {
+				if (c != this.pageSource.charAt(index)) {
 					return false;
 				}
 			} else {
@@ -749,14 +749,14 @@ public class JapidParser {
 	 *            number of chars to skip
 	 */
 	private void skipAhead(JapidParser.Token token, int i) {
-		this.methodCallStackInExpr.push(state);
-		state = token;
+		this.methodCallStackInExpr.push(this.state);
+		this.state = token;
 		skip(i);
 	}
 
 	void reset() {
-		end = begin = end2 = begin2 = 0;
-		state = Token.PLAIN;
+		this.end = this.begin = this.end2 = this.begin2 = 0;
+		this.state = Token.PLAIN;
 	}
 
 	/**
@@ -767,13 +767,13 @@ public class JapidParser {
 	public List<TokenPair> allTokens() {
 		List<TokenPair> result = new ArrayList<TokenPair>();
 		loop: for (;;) {
-			Token state = nextToken();
-			switch (state) {
+			Token state1 = nextToken();
+			switch (state1) {
 			case EOF:
 				break loop;
 			default:
 				String tokenstring = getToken();
-				result.add(new TokenPair(state, tokenstring));
+				result.add(new TokenPair(state1, tokenstring));
 			}
 		}
 		return result;

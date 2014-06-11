@@ -16,9 +16,9 @@ public class AltCacheSimpleImpl implements AltCache {
 
 	@Override
 	public CachedRenderResult get(String key) {
-		CachedRenderResult crr = cache.get(key);
+		CachedRenderResult crr = this.cache.get(key);
 		if (crr.isExpired()) {
-			cache.remove(key);
+			this.cache.remove(key);
 			return null;
 		} else {
 			return crr;
@@ -27,12 +27,12 @@ public class AltCacheSimpleImpl implements AltCache {
 
 	@Override
 	public void set(String key, CachedRenderResult rr, String ttl) {
-		cache.put(key, rr);
+		this.cache.put(key, rr);
 	}
 
 	@Override
 	public void delete(String key) {
-		cache.remove(key);
+		this.cache.remove(key);
 	}
 
 }

@@ -22,43 +22,48 @@ public class FlashScopeGeneric implements FlashScope {
 	/* (non-Javadoc)
 	 * @see bran.japid.Flash#hasSuccess()
 	 */
+	@Override
 	public boolean hasSuccess() {
-		return store.containsKey(SUCCESS);
+		return this.store.containsKey(SUCCESS);
 	}
 
 	/* (non-Javadoc)
 	 * @see bran.japid.Flash#getSuccess()
 	 */
+	@Override
 	public Object success() {
-		return store.get(SUCCESS);
+		return this.store.get(SUCCESS);
 	}
 
 	/* (non-Javadoc)
 	 * @see bran.japid.Flash#putSuccess(java.lang.Object)
 	 */
 	public void putSuccess(Object message) {
-		store.put(SUCCESS, message);
+		this.store.put(SUCCESS, message);
 	}
 
 	/* (non-Javadoc)
 	 * @see bran.japid.Flash#hasError()
 	 */
+	@Override
 	public boolean hasError() {
-		return store.containsKey(ERROR);
+		return this.store.containsKey(ERROR);
 	}
 	
 	/* (non-Javadoc)
 	 * @see bran.japid.Flash#getError()
 	 */
+	@Override
 	public Object error() {
-		return store.get(ERROR);
+		return this.store.get(ERROR);
 	}
 
 	/* (non-Javadoc)
 	 * @see bran.japid.Flash#get(java.lang.String)
 	 */
+	@Override
 	public Object get(String key) {
-		return store.get(key);
+		return this.store.get(key);
 	}
 
 	@Override
@@ -72,6 +77,6 @@ public class FlashScopeGeneric implements FlashScope {
 	 */
 	@Override
 	public void putSuccess(String message) {
-		store.put(SUCCESS, message);
+		this.store.put(SUCCESS, message);
 	}
 }

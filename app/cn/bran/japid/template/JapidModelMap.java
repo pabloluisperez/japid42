@@ -3,7 +3,6 @@ package cn.bran.japid.template;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import cn.bran.japid.util.StringUtils;
 
@@ -16,7 +15,7 @@ public class JapidModelMap {
 	Map<String, Object> map = new HashMap<String, Object>();
 	
 	public JapidModelMap put(String key, Object val) {
-		map.put(key, val);
+		this.map.put(key, val);
 		return this;
 	}
 
@@ -25,10 +24,10 @@ public class JapidModelMap {
 		Object[] ret = new Object[argNames.length];
 		
 		for (int i = 0; i < argNames.length; i++) {
-			ret[i] = map.remove(argNames[i]);
+			ret[i] = this.map.remove(argNames[i]);
 		}
-		if (map.size() > 0) {
-			Set<String> keys = map.keySet();
+		if (this.map.size() > 0) {
+			Set<String> keys = this.map.keySet();
 			String sep = ", ";
 			String ks = "[" + StringUtils.join(keys, sep) + "]";
 			String vs = "[" + StringUtils.join(argNames, sep) + "]";

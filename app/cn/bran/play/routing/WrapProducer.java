@@ -13,9 +13,9 @@ public class WrapProducer extends SimpleResult {
 	private String produces;
 	private SimpleResult r;
 
-	public WrapProducer(String produces, SimpleResult r) {
-		this.produces = produces;
-		this.r = r;
+	public WrapProducer(String _produces, SimpleResult _r) {
+		this.produces = _produces;
+		this.r = _r;
 	}
 
 //	public play.api.mvc.Result getWrappedResult() {
@@ -27,6 +27,6 @@ public class WrapProducer extends SimpleResult {
 	 */
 	@Override
 	public play.api.mvc.SimpleResult getWrappedSimpleResult() {
-		return r.getWrappedSimpleResult().as(produces);
+		return this.r.getWrappedSimpleResult().as(this.produces);
 	}
 }

@@ -21,10 +21,10 @@ public class AmmendableScheduledExecutor extends ScheduledThreadPoolExecutor {
 	}
 
 	public void schedule(Runnable r) {
-		if (schedule != null) {
-			schedule.cancel(false);
+		if (this.schedule != null) {
+			this.schedule.cancel(false);
 		}
-		schedule = super.schedule(r, 2, TimeUnit.SECONDS);
+		this.schedule = super.schedule(r, 2, TimeUnit.SECONDS);
 	}
 	
 }

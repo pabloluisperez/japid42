@@ -2,7 +2,6 @@ package cn.bran.play;
 
 import play.cache.Cache;
 import play.libs.Time;
-import play.mvc.Result;
 import cn.bran.japid.template.RenderResult;
 
 /**
@@ -49,8 +48,8 @@ public class RenderResultCache {
 		return altCache;
 	}
 
-	public static void setAltCache(AltCache altCache) {
-		RenderResultCache.altCache = altCache;
+	public static void setAltCache(AltCache _altCache) {
+		RenderResultCache.altCache = _altCache;
 	}
 
 	/**

@@ -27,16 +27,16 @@ public class ParamSpec {
 	public ParamSpec(String s) {
 		int i = s.indexOf(':');
 		if (i > 0) {
-			name = s.substring(0, i).trim();
-			format = s.substring(++i).trim();
+			this.name = s.substring(0, i).trim();
+			this.format = s.substring(++i).trim();
 		} else {
-			name = s.trim();
+			this.name = s.trim();
 		}
-		formatPattern = Pattern.compile(format);
+		this.formatPattern = Pattern.compile(this.format);
 	}
 	
 	@Override
 	public String toString() {
-		return type.getSimpleName() + " " + name;
+		return this.type.getSimpleName() + " " + this.name;
 	}
 }

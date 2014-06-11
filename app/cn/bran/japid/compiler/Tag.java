@@ -15,7 +15,7 @@ public class Tag {
 	// each line contains a line of text in the body of a tag scope.
 	List<String> bodyTextList = new ArrayList<String>();
 	{
-		bodyTextList.add("");
+		this.bodyTextList.add("");
 	}
 	public String innerClassName;
 	public String args = "";
@@ -25,10 +25,10 @@ public class Tag {
 	List<NamedArg> namedArgs = null;
 	
 	public String getBodyText() {
-		if (!hasBody)
+		if (!this.hasBody)
 			return null;
 		StringBuffer sb = new StringBuffer(2000);
-		for (String s : bodyTextList) {
+		for (String s : this.bodyTextList) {
 			sb.append(s).append('\n');
 		}
 		String string = sb.toString();
@@ -36,7 +36,7 @@ public class Tag {
 	}
 
 	public String getTagVarName() {
-		return "_" + tagName.replace('.', '_').replace('/', '_') + tagIndex;
+		return "_" + this.tagName.replace('.', '_').replace('/', '_') + this.tagIndex;
 	}
 
 	public String getBodyVar() {
@@ -45,19 +45,19 @@ public class Tag {
 
 	@Override
 	public String toString() {
-		return tagName;
+		return this.tagName;
 	}
 	public boolean isRoot() {
-		return tagName.equals(ROOT_TAGNAME);
+		return this.tagName.equals(ROOT_TAGNAME);
 	}
 	
 	public static class TagIf extends Tag {
 		public TagIf(String expr, int line) {
 			super();
-			args = expr;
-			tagName = "if";
+			this.args = expr;
+			this.tagName = "if";
 			super.startLine = line;
-			hasBody = true;
+			this.hasBody = true;
 		}
 
 	}
@@ -78,8 +78,8 @@ public class Tag {
 	public static class TagDef extends TagInTag {
 		public TagDef() {
 			super();
-			tagName = "def";
-			hasBody = true;
+			this.tagName = "def";
+			this.hasBody = true;
 		}
 		
 	}
@@ -91,10 +91,10 @@ public class Tag {
 	public static class TagSet extends TagInTag {
 		public TagSet() {
 			super();
-			tagName = "set";
+			this.tagName = "set";
 		}
 	}
 	public boolean argsNamed() {
-		return (namedArgs != null && namedArgs.size() > 0);
+		return (this.namedArgs != null && this.namedArgs.size() > 0);
 	}
 }

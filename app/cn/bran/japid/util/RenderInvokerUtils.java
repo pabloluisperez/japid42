@@ -17,8 +17,9 @@ public class RenderInvokerUtils {
 	 */
 	private static final String DELI = ", ";
 
-	public static <T extends JapidTemplateBaseWithoutPlay> RenderResult render(T t, Object... args)
+	public static <T extends JapidTemplateBaseWithoutPlay> RenderResult render(T t, Object... _args)
 			throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+		Object[] args = _args;
 		if (args == null) {
 			// treat it as a single null argument
 			args = new Object[] { null };
@@ -83,12 +84,13 @@ public class RenderInvokerUtils {
 	}
 
 	public static <T extends JapidTemplateBaseWithoutPlay> RenderResult renderWithNamedArgs(T t,
-			NamedArgRuntime... args) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+			NamedArgRuntime... _args) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+		Object[] args = _args;
 		if (args == null) {
 			// treat it as a single null argument
 			args = new NamedArgRuntime[] { null };
 		}
-		return render(t, t.buildArgs(args));
+		return render(t, t.buildArgs((NamedArgRuntime[]) args));
 	}
 
 	/**

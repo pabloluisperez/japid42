@@ -28,13 +28,11 @@ public class SimpleMessageProvider implements MessageProvider {
 	
 	@Override
 	public String getMessage(String msgName, Object... args) {
-		String template = messages.get(msgName);
+		String template = this.messages.get(msgName);
 		if (template != null) {
 			return String.format(template, args);
 		}
-		else {
-			return "?";
-		}
+		return "?";
 	}
 
 }

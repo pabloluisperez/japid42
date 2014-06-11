@@ -17,11 +17,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.io.Serializable;
-import java.lang.String;
-import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -38,10 +34,10 @@ public class RenderResult implements Externalizable {
 	long renderTime; // in us, (micro-second) for recording the time to render.
 	private Map<String, String> headers = new HashMap<String, String>();
 	
-	public RenderResult(Map<String, String> headers , StringBuilder content, long renderTime) {
-		this.content = content;
-		this.renderTime = renderTime;
-		this.headers = headers;
+	public RenderResult(Map<String, String> _headers , StringBuilder _content, long _renderTime) {
+		this.content = _content;
+		this.renderTime = _renderTime;
+		this.headers = _headers;
 	}
 
 	public RenderResult() {
@@ -56,7 +52,7 @@ public class RenderResult implements Externalizable {
 	 * @return the fully interpolated content
 	 */
 	public StringBuilder getContent() {
-		return content;
+		return this.content;
 	}
 
 	/**
@@ -64,7 +60,7 @@ public class RenderResult implements Externalizable {
 	 * @return
 	 */
 	public String getText() {
-		return content.toString();
+		return this.content.toString();
 	}
 	
 	public long getRenderTime() {
@@ -89,9 +85,9 @@ public class RenderResult implements Externalizable {
 	public String toStringWithHeaders() {
 		// print the headers:
 		StringBuffer sb = new StringBuffer();
-		if (headers != null) {
-			for (String it : headers.keySet()) {
-				sb.append(it).append(": ").append(headers.get(it)).append("\n");
+		if (this.headers != null) {
+			for (String it : this.headers.keySet()) {
+				sb.append(it).append(": ").append(this.headers.get(it)).append("\n");
 			}
 		}
 		if (sb.toString().endsWith("\n")) {
@@ -108,10 +104,10 @@ public class RenderResult implements Externalizable {
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
-		String contentString = content == null? _NULL : content.toString();
+		String contentString = this.content == null? _NULL : this.content.toString();
 		out.writeUTF(contentString);
-		out.writeLong(renderTime);
-		out.writeObject(headers);
+		out.writeLong(this.renderTime);
+		out.writeObject(this.headers);
 	}
 
 	@Override
@@ -123,8 +119,8 @@ public class RenderResult implements Externalizable {
 		else {
 			this.content = new StringBuilder(contentString);
 		}
-		renderTime = in.readLong();
-		headers = (Map<String, String>) in.readObject();
+		this.renderTime = in.readLong();
+		this.headers = (Map<String, String>) in.readObject();
 	}
 
 	public String getContentType() {

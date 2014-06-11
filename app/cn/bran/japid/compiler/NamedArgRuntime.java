@@ -1,6 +1,5 @@
 package cn.bran.japid.compiler;
 
-import japa.parser.ast.expr.Expression;
 
 /**
  * a = "asd", b = 12, etc
@@ -9,15 +8,15 @@ import japa.parser.ast.expr.Expression;
  *
  */
 public class NamedArgRuntime {
-	public NamedArgRuntime(String name, Object val) {
-		this.name = name;
-		this.val = val;
+	public NamedArgRuntime(String _name, Object _val) {
+		this.name = _name;
+		this.val = _val;
 	}
 	public String name;
 	public Object val;
 	@Override
 	public String toString() {
-		return name + " = " + val;
+		return this.name + " = " + this.val;
 	}
 	
 }

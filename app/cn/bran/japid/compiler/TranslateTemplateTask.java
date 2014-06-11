@@ -57,7 +57,7 @@ public class TranslateTemplateTask {
 	// updated Java files
 	private List<File> changedTargetFiles = new LinkedList<File>();
 	public List<File> getChangedTargetFiles() {
-		return changedTargetFiles;
+		return this.changedTargetFiles;
 	}
 
 	private boolean usePlay = true;
@@ -66,8 +66,8 @@ public class TranslateTemplateTask {
 //		return usePlay;
 //	}
 
-	public void setUsePlay(boolean usePlay) {
-		this.usePlay = usePlay;
+	public void setUsePlay(boolean _usePlay) {
+		this.usePlay = _usePlay;
 	}
 
 	/**
@@ -76,69 +76,69 @@ public class TranslateTemplateTask {
 	 * @return
 	 */
 	public List<File> getChangedFiles() {
-		return changedFiles;
+		return this.changedFiles;
 	}
 
 	public void setDestdir(File p_destDir) {
-		destDir = p_destDir;
+		this.destDir = p_destDir;
 	}
 
 	public void setPackageRoot(File p_srcDir) {
-		packageRoot = p_srcDir;
+		this.packageRoot = p_srcDir;
 	}
 
 	public void setListFiles(boolean p_listFiles) {
-		listFiles = p_listFiles;
+		this.listFiles = p_listFiles;
 	}
 
 	public void execute(){
 		// first off, make sure that we've got a srcdir
 
-		if (packageRoot == null) {
+		if (this.packageRoot == null) {
 			throw new RuntimeException("srcdir attribute must be set!");
 		}
-		if (destDir == null) {
-			destDir = packageRoot;
+		if (this.destDir == null) {
+			this.destDir = this.packageRoot;
 		}
 
-		if (!packageRoot.exists() || !packageRoot.isDirectory()) {
-			throw new RuntimeException("source directory \"" + packageRoot + "\" does not exist or is not a directory");
+		if (!this.packageRoot.exists() || !this.packageRoot.isDirectory()) {
+			throw new RuntimeException("source directory \"" + this.packageRoot + "\" does not exist or is not a directory");
 		}
 
-		destDir.mkdirs();
-		if (!destDir.exists() || !destDir.isDirectory()) {
-			throw new RuntimeException("destination directory \"" + destDir + "\" does not exist or is not a directory");
+		this.destDir.mkdirs();
+		if (!this.destDir.exists() || !this.destDir.isDirectory()) {
+			throw new RuntimeException("destination directory \"" + this.destDir + "\" does not exist or is not a directory");
 		}
 
-		if(changedFiles == null) 
-			changedFiles = DirUtil.findChangedSrcFiles(include);
+		if(this.changedFiles == null) 
+			this.changedFiles = DirUtil.findChangedSrcFiles(this.include);
 
-		if (changedFiles.size() > 0) {
+		if (this.changedFiles.size() > 0) {
 //			JapidFlags.log("[Japid] Processing " + changedFiles.size() + " template" + (changedFiles.size() == 1 ? "" : "s") + " in directory tree: " + destDir);
 
-			JapidTemplateTransformer tran = new JapidTemplateTransformer(packageRoot.getPath(), null);
+			JapidTemplateTransformer tran = new JapidTemplateTransformer(this.packageRoot.getPath(), null);
 			tran.usePlay(this.usePlay);
 			for (Class<?> c : this.staticImports) {
-				tran.addImportStatic(c);
+				JapidTemplateTransformer.addImportStatic(c);
 			}
 			for (String c : this.imports) {
-				tran.addImportLine(c);
+				JapidTemplateTransformer.addImportLine(c);
 			}
 			for (Class<? extends Annotation> a : this.typeAnnotations) {
-				tran.addAnnotation(a);
+				JapidTemplateTransformer.addAnnotation(a);
 			}
 
-			for (int i = 0; i < changedFiles.size(); i++) {
-				File templateFile = changedFiles.get(i);
+			for (int i = 0; i < this.changedFiles.size(); i++) {
+				File templateFile = this.changedFiles.get(i);
 				JapidFlags.log("[Japid] Transforming template: " + templateFile.getPath() + " to: " + DirUtil.mapSrcToJava(templateFile.getName()));
-				if (listFiles) {
+				if (this.listFiles) {
 					JapidFlags.log(templateFile.getAbsolutePath());
 				}
 
 				try {
-					String relativePath = DirUtil.getRelativePath(templateFile, packageRoot);
+					String relativePath = DirUtil.getRelativePath(templateFile, this.packageRoot);
 					File generate = tran.generate(relativePath);
-					changedTargetFiles.add(generate);
+					this.changedTargetFiles.add(generate);
 				} catch (JapidCompilationException e) {
 					// syntax error
 					throw e;
@@ -158,43 +158,43 @@ public class TranslateTemplateTask {
 	public void executeInMemory(){
 		// first off, make sure that we've got a srcdir
 
-		if (packageRoot == null) {
+		if (this.packageRoot == null) {
 			throw new RuntimeException("srcdir attribute must be set!");
 		}
 		
-		if (!packageRoot.exists() && !packageRoot.isDirectory()) {
-			throw new RuntimeException("source directory \"" + packageRoot + "\" does not exist or is not a directory");
+		if (!this.packageRoot.exists() && !this.packageRoot.isDirectory()) {
+			throw new RuntimeException("source directory \"" + this.packageRoot + "\" does not exist or is not a directory");
 		}
 
-		if(changedFiles == null) 
-			changedFiles = DirUtil.findChangedSrcFiles(include);
+		if(this.changedFiles == null) 
+			this.changedFiles = DirUtil.findChangedSrcFiles(this.include);
 
-		if (changedFiles.size() > 0) {
+		if (this.changedFiles.size() > 0) {
 //			JapidFlags.log("[Japid] Processing " + changedFiles.size() + " template" + (changedFiles.size() == 1 ? "" : "s") + " in directory tree: " + destDir);
 
-			JapidTemplateTransformer tran = new JapidTemplateTransformer(packageRoot.getPath(), null);
+			JapidTemplateTransformer tran = new JapidTemplateTransformer(this.packageRoot.getPath(), null);
 			tran.usePlay(this.usePlay);
 			for (Class<?> c : this.staticImports) {
-				tran.addImportStatic(c);
+				JapidTemplateTransformer.addImportStatic(c);
 			}
 			for (String c : this.imports) {
-				tran.addImportLine(c);
+				JapidTemplateTransformer.addImportLine(c);
 			}
 			for (Class<? extends Annotation> a : this.typeAnnotations) {
-				tran.addAnnotation(a);
+				JapidTemplateTransformer.addAnnotation(a);
 			}
 
-			for (int i = 0; i < changedFiles.size(); i++) {
-				File templateFile = changedFiles.get(i);
+			for (int i = 0; i < this.changedFiles.size(); i++) {
+				File templateFile = this.changedFiles.get(i);
 				JapidFlags.log("[Japid] Transforming template: " + templateFile.getPath() + " to: " + DirUtil.mapSrcToJava(templateFile.getName()));
-				if (listFiles) {
+				if (this.listFiles) {
 					JapidFlags.log(templateFile.getAbsolutePath());
 				}
 
 				try {
-					String relativePath = DirUtil.getRelativePath(templateFile, packageRoot);
+					String relativePath = DirUtil.getRelativePath(templateFile, this.packageRoot);
 					File generate = tran.generate(relativePath);
-					changedTargetFiles.add(generate);
+					this.changedTargetFiles.add(generate);
 				} catch (JapidCompilationException e) {
 					// syntax error
 					throw e;
@@ -249,7 +249,7 @@ public class TranslateTemplateTask {
 	private boolean listFiles = false;
 
 	public void addAnnotation(Class<? extends Annotation> anno) {
-		typeAnnotations.add(anno);
+		this.typeAnnotations.add(anno);
 	}
 
 	List<Class<? extends Annotation>> typeAnnotations = new ArrayList<Class<? extends Annotation>>();
@@ -269,8 +269,8 @@ public class TranslateTemplateTask {
 	}
 
 	public void clearImports() {
-		staticImports.clear();
-		imports.clear();
+		this.staticImports.clear();
+		this.imports.clear();
 		
 		AbstractTemplateClassMetaData.clearImports();
 	}
@@ -278,7 +278,7 @@ public class TranslateTemplateTask {
 	/**
 	 * @param changedFiles the changedFiles to set. Each file starts with the package root. 
 	 */
-	public void setChangedFiles(List<File> changedFiles) {
-		this.changedFiles = changedFiles;
+	public void setChangedFiles(List<File> _changedFiles) {
+		this.changedFiles = _changedFiles;
 	}
 }

@@ -5,7 +5,7 @@ public class devError extends cn.bran.play.JapidTemplateBase
 {
 	private static final long serialVersionUID = -1632766355048011190L;
 
-	public static final String sourceTemplate = "/japidviews/devError.html";
+	public static final String sourceTemplate1 = "/japidviews/devError.html";
 	{
 		putHeader("Content-Type", "text/html; charset=utf-8");
 		setContentType("text/html; charset=utf-8");
@@ -42,16 +42,16 @@ public class devError extends cn.bran.play.JapidTemplateBase
 		setArgNames(argNames);
 		setArgTypes(argTypes);
 		setArgDefaults(argDefaults);
-		setSourceTemplate(sourceTemplate);
+		setSourceTemplate(sourceTemplate1);
 	}
 ////// end of named args stuff
 
 	private cn.bran.japid.exceptions.JapidTemplateException error; // line 1
-	public cn.bran.japid.template.RenderResult render(cn.bran.japid.exceptions.JapidTemplateException error) {
-		this.error = error;
+	public cn.bran.japid.template.RenderResult render(cn.bran.japid.exceptions.JapidTemplateException _error) {
+		this.error = _error;
 		long __t = -1;
 		try {super.layout();} catch (RuntimeException e) { super.handleException(e);} // line 1
-		return new cn.bran.japid.template.RenderResultPartial(getHeaders(), getOut(), __t, actionRunners, sourceTemplate);
+		return new cn.bran.japid.template.RenderResultPartial(getHeaders(), getOut(), __t, this.actionRunners, sourceTemplate1);
 	}
 
 	public static cn.bran.japid.template.RenderResult apply(cn.bran.japid.exceptions.JapidTemplateException error) {
@@ -59,7 +59,7 @@ public class devError extends cn.bran.play.JapidTemplateBase
 	}
 
 	@Override protected void doLayout() {
-		beginDoLayout(sourceTemplate);
+		beginDoLayout(sourceTemplate1);
 //------
 ;// line 1
 		p("\n");// line 1
@@ -67,7 +67,7 @@ public class devError extends cn.bran.play.JapidTemplateBase
 "<html>\n" + 
 "	<head>\n" + 
 "		<title>");// line 2
-		p(error.title);// line 6
+		p(this.error.title);// line 6
 		p("</title>\n" + 
 "		<link rel=\"shortcut icon\" href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAlFJREFUeNqUU8tOFEEUPVVdNV3dPe8xYRBnjGhmBgKjKzCIiQvBoIaNbly5Z+PSv3Aj7DSiP2B0rwkLGVdGgxITSCRIJGSMEQWZR3eVt5sEFBgTb/dN1yvnnHtPNTPG4PqdHgCMXnPRSZrpSuH8vUJu4DE4rYHDGAZDX62BZttHqTiIayM3gGiXQsgYLEvATaqxU+dy1U13YXapXptpNHY8iwn8KyIAzm1KBdtRZWErpI5lEWTXp5Z/vHpZ3/wyKKwYGGOdAYwR0EZwoezTYApBEIObyELl/aE1/83cp40Pt5mxqCKrE4Ck+mVWKKcI5tA8BLEhRBKJLjez6a7MLq7XZtp+yyOawwCBtkiBVZDKzRk4NN7NQBMYPHiZDFhXY+p9ff7F961vVcnl4R5I2ykJ5XFN7Ab7Gc61VoipNBKF+PDyztu5lfrSLT/wIwCxq0CAGtXHZTzqR2jtwQiXONma6hHpj9sLT7YaPxfTXuZdBGA02Wi7FS48YiTfj+i2NhqtdhP5RC8mh2/Op7y0v6eAcWVLFT8D7kWX5S9mepp+C450MV6aWL1cGnvkxbwHtLW2B9AOkLeUd9KEDuh9fl/7CEj7YH5g+3r/lWfF9In7tPz6T4IIwBJOr1SJyIGQMZQbsh5P9uBq5VJtqHh2mo49pdw5WFoEwKWqWHacaWOjQXWGcifKo6vj5RGS6zykI587XeUIQDqJSmAp+lE4qt19W5P9o8+Lma5DcjsC8JiT607lMVkdqQ0Vyh3lHhmh52tfNy78ajXv0rgYzv8nfwswANuk+7sD/Q0aAAAAAElFTkSuQmCC\">\n" + 
 "	    <style>\n" + 
@@ -167,15 +167,15 @@ public class devError extends cn.bran.play.JapidTemplateBase
 "	</head>\n" + 
 "	<body>\n" + 
 "		<h1>");// line 6
-		p(escape(error.title));// line 104
+		p(escape(this.error.title));// line 104
 		p("</h1>\n" + "\n" + "		<p id=\"detail\">\n" + "		    ");// line 104
-		p(escape(error.description));// line 107
+		p(escape(this.error.description));// line 107
 		p("		</p>\n" + "		");// line 107
 		p("        <div>\n" + "        	");// line 113
-		TreeMap<Integer, String> lines = error.interestingLines; // line 115
+		TreeMap<Integer, String> lines = this.error.interestingLines; // line 115
 		for (int i : lines.keySet()) {// line 116
 			String line = lines.get(i);// line 117
-			if (error.errLineNum == i) {// line 118
+			if (this.error.errLineNum == i) {// line 118
 				p("					<pre class=\"error\"><span class=\"line\">");// line 118
 				p(i);// line 119
 				p("</span><span class=\"code\">");// line 119
@@ -192,7 +192,7 @@ public class devError extends cn.bran.play.JapidTemplateBase
 		p("		</div>\n" + "			    \n" + "	</body>\n" + "</html>\n" + "\n" + "\n" + "\n" + "\n" + "\n" + "\n" + "\n");// line
 																													// 123
 
-		endDoLayout(sourceTemplate);
+		endDoLayout(sourceTemplate1);
 	}
 
 }

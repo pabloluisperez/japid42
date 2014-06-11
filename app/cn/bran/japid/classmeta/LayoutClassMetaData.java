@@ -41,6 +41,7 @@ public class LayoutClassMetaData extends AbstractTemplateClassMetaData {
 	/**
 	 * 
 	 */
+	@Override
 	protected void childLayout() {
 		p("\n\tprotected abstract void doLayout();\n");
 	}
@@ -50,9 +51,10 @@ public class LayoutClassMetaData extends AbstractTemplateClassMetaData {
 	 * operation method stub so subclass can selectively override the getters in
 	 * the layout
 	 */
+	@Override
 	protected void getterSetter() {
 		pln();
-		for (String key : getterMethods) {
+		for (String key : this.getterMethods) {
 			// p("\t protected abstract void " + key + "();\n");
 			p("\t protected void " + key + "() {};\n");
 		}
@@ -61,8 +63,9 @@ public class LayoutClassMetaData extends AbstractTemplateClassMetaData {
 	/**
 	 * 
 	 */
+	@Override
 	protected void layoutMethod() {
-		if (renderArgs != null) {
+		if (this.renderArgs != null) {
 			// create fields for the render args and create a render method to
 			List<Parameter> params = JavaSyntaxTool.parseParams(this.renderArgs);
 

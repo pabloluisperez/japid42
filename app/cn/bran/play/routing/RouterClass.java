@@ -42,19 +42,19 @@ public class RouterClass {
 	 * @param cl
 	 */
 	public RouterClass(Class<?> cl, String appPath) {
-		clz = cl;
-		path = cl.getAnnotation(Path.class).value();
-		if (path.length() == 0) {
+		this.clz = cl;
+		this.path = cl.getAnnotation(Path.class).value();
+		if (this.path.length() == 0) {
 			// auto-pathing. using the class full name minus the "controller." part as the path
 			String cname = cl.getName();
 			if (cname.startsWith(JaxrsRouter.routerPackage + "."))
 				cname = cname.substring((JaxrsRouter.routerPackage + ".").length());
-			path = cname;
+			this.path = cname;
 		}
-		absPath = appPath + JaxrsRouter.prefixSlash(path);
+		this.absPath = appPath + JaxrsRouter.prefixSlash(this.path);
 
-		String r = absPath.replaceAll(JaxrsRouter.urlParamCapture, "(.*)");
-		absPathPatternForValues = Pattern.compile(r);
+		String r = this.absPath.replaceAll(JaxrsRouter.urlParamCapture, "(.*)");
+		this.absPathPatternForValues = Pattern.compile(r);
 
 //		@SuppressWarnings("unchecked")
 //		Predicate<AnnotatedElement> and = Predicates.or(withAnnotation(GET.class),
@@ -66,7 +66,7 @@ public class RouterClass {
 		Set<Method> allMethods = getAllMethods(cl, Predicates.and(withModifier(Modifier.STATIC), withReturnType(Result.class)));
 		for (Method m : allMethods) {
 			if (m.getDeclaringClass() == cl)
-				routerMethods.add(new RouterMethod(m, absPath));
+				this.routerMethods.add(new RouterMethod(m, this.absPath));
 		}
 	}
 
@@ -79,7 +79,7 @@ public class RouterClass {
 			contentType = ct[0];
 		
 		try {
-			for (RouterMethod m : routerMethods) {
+			for (RouterMethod m : this.routerMethods) {
 				if (m.containsConsumeType(contentType) 
 						&& m.supportHttpMethod(r.method())
 						&& m.matchURI(uri)) {
@@ -100,7 +100,7 @@ public class RouterClass {
 	@Override
 	public String toString() {
 		String ret = "";
-		for (RouterMethod m : routerMethods) {
+		for (RouterMethod m : this.routerMethods) {
 			ret += m.toString() + "\n";
 		}
 		return ret;
@@ -108,7 +108,7 @@ public class RouterClass {
 	
 	public List<RouteEntry> getRouteTable(){
 		List<RouteEntry> entries  = new ArrayList<RouteEntry>();
-		for (RouterMethod m : routerMethods) {
+		for (RouterMethod m : this.routerMethods) {
 			entries.add(m.getRouteEntry());
 		}
 		return entries;

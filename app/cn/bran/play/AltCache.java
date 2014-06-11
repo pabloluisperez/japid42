@@ -1,6 +1,5 @@
 package cn.bran.play;
 
-import cn.bran.japid.template.RenderResult;
 
 public interface AltCache {
 

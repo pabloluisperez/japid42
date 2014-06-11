@@ -12,7 +12,6 @@ import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
 import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 
 import cn.bran.japid.template.JapidRenderer;
-import cn.bran.japid.util.JapidFlags;
 import cn.bran.japid.util.StringUtils;
 
 /**
@@ -47,7 +46,7 @@ final class NameEnv implements INameEnvironment {
 		try {
 			if (!name.startsWith("japidviews.")) {
 				// let super class loader to load the bytecode
-				byte[] bytes = crlr.getClassDefinition(name);
+				byte[] bytes = this.crlr.getClassDefinition(name);
 				if (bytes != null) {
 					// System.out.println("japid: byecode found: " + name);
 					return new NameEnvironmentAnswer(new ClassFileReader(bytes, fileName, true), null);
@@ -77,19 +76,19 @@ final class NameEnv implements INameEnvironment {
 	@Override
 	public boolean isPackage(char[][] parentPackageName, char[] packageName) {
 		String name = StringUtils.join(parentPackageName, ".") + "." + new String(packageName);
-		if (packagesCache.containsKey(name)) {
-			return packagesCache.get(name).booleanValue();
+		if (this.packagesCache.containsKey(name)) {
+			return this.packagesCache.get(name).booleanValue();
 		}
 		// Check if there is a .java or .class for this resource
-		if (crlr.getClassDefinition(name) != null) {
-			packagesCache.put(name, false);
+		if (this.crlr.getClassDefinition(name) != null) {
+			this.packagesCache.put(name, false);
 			return false;
 		}
 		if (JapidRenderer.japidClasses.get(name) != null) {
-			packagesCache.put(name, false);
+			this.packagesCache.put(name, false);
 			return false;
 		}
-		packagesCache.put(name, true);
+		this.packagesCache.put(name, true);
 		return true;
 	}
 

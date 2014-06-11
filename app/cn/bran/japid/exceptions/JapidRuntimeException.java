@@ -9,9 +9,9 @@ public class JapidRuntimeException extends RuntimeException {
 	 * @param title2
 	 * @param description2
 	 */
-	public JapidRuntimeException(String title, String descr) {
+	public JapidRuntimeException(String _title, String descr) {
 		super(descr);
-		this.title = title;
+		this.title = _title;
 		this.description = descr;
 	}
 

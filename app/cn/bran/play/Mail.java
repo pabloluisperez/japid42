@@ -43,7 +43,8 @@ public class Mail {
 	/**
 	 * Send an email
 	 */
-	public static Future<Boolean> send(Email email) {
+	public static Future<Boolean> send(Email _email) {
+		Email email = _email;
 		try {
 			email = buildMessage(email);
 
@@ -53,23 +54,28 @@ public class Mail {
 					Mock.send(email);
 					return new Future<Boolean>() {
 
+						@Override
 						public boolean cancel(boolean mayInterruptIfRunning) {
 							return false;
 						}
 
+						@Override
 						public boolean isCancelled() {
 							return false;
 						}
 
+						@Override
 						public boolean isDone() {
 							return true;
 						}
 
+						@Override
 						public Boolean get() throws InterruptedException,
 								ExecutionException {
 							return true;
 						}
 
+						@Override
 						public Boolean get(long timeout, TimeUnit unit)
 								throws InterruptedException,
 								ExecutionException, TimeoutException {
@@ -235,6 +241,7 @@ public class Mail {
 		if (asynchronousSend) {
 			return executor.submit(new Callable<Boolean>() {
 
+				@Override
 				public Boolean call() {
 					try {
 						msg.setSentDate(new Date());
@@ -248,43 +255,47 @@ public class Mail {
 					}
 				}
 			});
-		} else {
-			final StringBuffer result = new StringBuffer();
-			try {
-				msg.setSentDate(new Date());
-				msg.send();
-			} catch (Throwable e) {
-				MailException me = new MailException(
-						"Error while sending email", e);
-				Logger.error("The email has not been sent", me);
-				result.append("oops");
-			}
-			return new Future<Boolean>() {
-
-				public boolean cancel(boolean mayInterruptIfRunning) {
-					return false;
-				}
-
-				public boolean isCancelled() {
-					return false;
-				}
-
-				public boolean isDone() {
-					return true;
-				}
-
-				public Boolean get() throws InterruptedException,
-						ExecutionException {
-					return result.length() == 0;
-				}
-
-				public Boolean get(long timeout, TimeUnit unit)
-						throws InterruptedException, ExecutionException,
-						TimeoutException {
-					return result.length() == 0;
-				}
-			};
 		}
+		final StringBuffer result = new StringBuffer();
+		try {
+			msg.setSentDate(new Date());
+			msg.send();
+		} catch (Throwable e) {
+			MailException me = new MailException(
+					"Error while sending email", e);
+			Logger.error("The email has not been sent", me);
+			result.append("oops");
+		}
+		return new Future<Boolean>() {
+
+			@Override
+			public boolean cancel(boolean mayInterruptIfRunning) {
+				return false;
+			}
+
+			@Override
+			public boolean isCancelled() {
+				return false;
+			}
+
+			@Override
+			public boolean isDone() {
+				return true;
+			}
+
+			@Override
+			public Boolean get() throws InterruptedException,
+					ExecutionException {
+				return result.length() == 0;
+			}
+
+			@Override
+			public Boolean get(long timeout, TimeUnit unit)
+					throws InterruptedException, ExecutionException,
+					TimeoutException {
+				return result.length() == 0;
+			}
+		};
 	}
 
 	static ExecutorService executor = Executors.newCachedThreadPool();
@@ -294,14 +305,14 @@ public class Mail {
 		private String user;
 		private String password;
 
-		public SMTPAuthenticator(String user, String password) {
-			this.user = user;
-			this.password = password;
+		public SMTPAuthenticator(String _user, String _password) {
+			this.user = _user;
+			this.password = _password;
 		}
 
 		@Override
 		protected PasswordAuthentication getPasswordAuthentication() {
-			return new PasswordAuthentication(user, password);
+			return new PasswordAuthentication(this.user, this.password);
 		}
 	}
 
@@ -344,19 +355,18 @@ public class Mail {
 					&& message.getContent() instanceof Part) {
 				if (!Message.ATTACHMENT.equals(message.getDisposition())) {
 					return getContent((Part) message.getContent());
-				} else {
-					return "attachment: \n"
-							+ "\t\t name: "
-							+ (StringUtils.isEmpty(message.getFileName()) ? "none"
-									: message.getFileName())
-							+ "\n"
-							+ "\t\t disposition: "
-							+ message.getDisposition()
-							+ "\n"
-							+ "\t\t description: "
-							+ (StringUtils.isEmpty(message.getDescription()) ? "none"
-									: message.getDescription()) + "\n\t";
 				}
+				return "attachment: \n"
+						+ "\t\t name: "
+						+ (StringUtils.isEmpty(message.getFileName()) ? "none"
+								: message.getFileName())
+						+ "\n"
+						+ "\t\t disposition: "
+						+ message.getDisposition()
+						+ "\n"
+						+ "\t\t description: "
+						+ (StringUtils.isEmpty(message.getDescription()) ? "none"
+								: message.getDescription()) + "\n\t";
 			}
 
 			return "";
@@ -369,8 +379,8 @@ public class Mail {
 				Properties props = new Properties();
 				props.put("mail.smtp.host", "myfakesmtpserver.com");
 
-				Session session = Session.getInstance(props);
-				email.setMailSession(session);
+				Session _session = Session.getInstance(props);
+				email.setMailSession(_session);
 
 				email.buildMimeMessage();
 

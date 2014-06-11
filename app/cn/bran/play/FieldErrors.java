@@ -1,10 +1,6 @@
 package cn.bran.play;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import play.data.validation.Validation;
 
 public class FieldErrors extends ArrayList<Error> {
     

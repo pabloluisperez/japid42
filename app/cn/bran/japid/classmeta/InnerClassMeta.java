@@ -37,11 +37,11 @@ public class InnerClassMeta {
 	String renderParams;
 	String renderBody;
 //	private String interfaceName;
-	public InnerClassMeta(String tagName, int counter, String callbackArgs, String renderBody) {
-		this.tagName = tagName.replace('/', '.');
-		this.counter = counter;
+	public InnerClassMeta(String _tagName, int _counter, String callbackArgs, String _renderBody) {
+		this.tagName = _tagName.replace('/', '.');
+		this.counter = _counter;
 		this.renderParams = JavaSyntaxTool.boxPrimitiveTypesInParams(callbackArgs);
-		this.renderBody = renderBody;
+		this.renderBody = _renderBody;
 	}
 //
 //	/**
@@ -101,7 +101,7 @@ public class InnerClassMeta {
 	}
 	
 	public String getVarRoot() {
-		return tagName.replace('.', '_').replace('/', '_');
+		return this.tagName.replace('.', '_').replace('/', '_');
 	}
 
 	/**
@@ -128,19 +128,19 @@ public class InnerClassMeta {
 		if (generics.startsWith(","))
 			generics = "<" + generics.substring(1).trim() + ">";
 		
-		if (Each.class.getSimpleName().equalsIgnoreCase(tagName)) {
+		if (Each.class.getSimpleName().equalsIgnoreCase(this.tagName)) {
 			// append extra argument to the render method
-			tagName = Each.class.getSimpleName();
-			renderParams += EXTRA_LOOP_ATTRS;
+			this.tagName = Each.class.getSimpleName();
+			this.renderParams += EXTRA_LOOP_ATTRS;
 		}
 		
-		String paramList = renderParams;
+		String paramList = this.renderParams;
 		String renderArgsWithFinal = JavaSyntaxTool.addFinalToAllParams(paramList);
 		
 		StringBuilder sb = new StringBuilder();
-		line(sb, "new " + tagName + ".DoBody" +  generics + "(){ " + lineMarker);
+		line(sb, "new " + this.tagName + ".DoBody" +  generics + "(){ " + lineMarker);
 		line(sb, "public void render(" + renderArgsWithFinal  + ") { " + lineMarker);
-		line(sb, renderBody);
+		line(sb, this.renderBody);
 		line(sb, "}");
 		String bufferString = "\r\n" + 
 				"StringBuilder oriBuffer;\r\n" + 

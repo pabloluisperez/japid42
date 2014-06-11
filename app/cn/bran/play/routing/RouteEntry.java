@@ -10,11 +10,11 @@ package cn.bran.play.routing;
 public class RouteEntry {
 	public String verb, path, action;
 
-	public RouteEntry(String verb, String path, String action) {
+	public RouteEntry(String _verb, String _path, String _action) {
 		super();
-		this.verb = verb;
-		this.path = path;
-		this.action = action;
+		this.verb = _verb;
+		this.path = _path;
+		this.action = _action;
 	}
 	
 	

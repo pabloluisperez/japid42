@@ -19,8 +19,6 @@ import java.util.regex.Pattern;
 import cn.bran.japid.classmeta.AbstractTemplateClassMetaData;
 import cn.bran.japid.classmeta.TemplateClassMetaData;
 import cn.bran.japid.compiler.Tag.TagSet;
-import cn.bran.japid.template.ActionRunner;
-import cn.bran.japid.template.RenderResult;
 
 /**
  * specifically for callable templates
@@ -45,12 +43,12 @@ public class JapidTemplateCompiler extends JapidAbstractCompiler {
 		if (tag.tagName.equals(DO_BODY)) {
 			String[] argPartsAndVar = JavaSyntaxTool.breakArgParts(tag.args);
 			if (argPartsAndVar.length == 1){
-				tcmd.doBody(tag.args);
+				this.tcmd.doBody(tag.args);
 				print("if (body != null){ body.setBuffer(getOut()); body.render(" + tag.args + "); body.resetBuffer();}");
 			}
 			else {
 				String args = argPartsAndVar[0];
-				tcmd.doBody(args);
+				this.tcmd.doBody(args);
 				String localVar = argPartsAndVar[1];
 				print("String " + localVar + " = renderBody(" + args + ");");
 			}
@@ -58,7 +56,7 @@ public class JapidTemplateCompiler extends JapidAbstractCompiler {
 		} else if ("set".equals(tag.tagName)) {
 			if (SET_ARG_PATTERN_ONELINER.matcher(tag.args).matches()) {
 				if (tag.hasBody) {
-					throw new JapidCompilationException(template, parser.getLineNumber(), "set tag cannot have value both in tag and in body: " + tag + " " + tag.args);
+					throw new JapidCompilationException(this.template, this.parser.getLineNumber(), "set tag cannot have value both in tag and in body: " + tag + " " + tag.args);
 				} else {
 					int i = 0;
 					
@@ -74,7 +72,7 @@ public class JapidTemplateCompiler extends JapidAbstractCompiler {
 					if (JavaSyntaxTool.isValidExpr(value))
 						this.tcmd.addSetTag(key, "p(" + value + ");", (TagSet) tag);
 					else
-						throw new JapidCompilationException(template, parser.getLineNumber(), "The value part in the set tag is not a valid expression: " + value + ". " + "The grammar is: set var_name = java_expression.");
+						throw new JapidCompilationException(this.template, this.parser.getLineNumber(), "The value part in the set tag is not a valid expression: " + value + ". " + "The grammar is: set var_name = java_expression.");
 				}
 			}
 			else {
@@ -95,7 +93,7 @@ public class JapidTemplateCompiler extends JapidAbstractCompiler {
 		pushToStack(tag);
 		markLine();
 		println();
-		skipLineBreak = true;
+		this.skipLineBreak = true;
 
 	}
 	
@@ -106,7 +104,7 @@ public class JapidTemplateCompiler extends JapidAbstractCompiler {
 	
 	@Override
 	protected AbstractTemplateClassMetaData getTemplateClassMetaData() {
-		return tcmd;
+		return this.tcmd;
 	}
 	
 	@Override
@@ -116,17 +114,17 @@ public class JapidTemplateCompiler extends JapidAbstractCompiler {
 			String args = line.trim().substring(DO_BODY.length()).trim();
 			String[] argPartsAndVar = JavaSyntaxTool.breakArgParts(args);
 			if (argPartsAndVar.length == 1){
-				tcmd.doBody(args);
+				this.tcmd.doBody(args);
 				printLine("if (body != null){ body.setBuffer(getOut()); body.render(" + args + "); body.resetBuffer();}");
 			}
 			else {
 				args = argPartsAndVar[0];
-				tcmd.doBody(args);
+				this.tcmd.doBody(args);
 				String localVar = argPartsAndVar[1];
 				printLine("String " + localVar + " = renderBody(" + args + ");");
 			}
 			
-			skipLineBreak = true;
+			this.skipLineBreak = true;
 		}
 		else {
 			super.scriptline(token);

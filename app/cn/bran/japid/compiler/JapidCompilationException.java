@@ -20,22 +20,22 @@ public class JapidCompilationException extends RuntimeException {
 	JapidTemplate template;
 	int startLine;
 	
-	public JapidCompilationException(JapidTemplate template, int startLine, String string) {
-		super(template.name + " (line " + startLine + "): " + string);
-		this.template = template;
-		this.startLine = startLine;
+	public JapidCompilationException(JapidTemplate _template, int _startLine, String string) {
+		super(_template.name + " (line " + _startLine + "): " + string);
+		this.template = _template;
+		this.startLine = _startLine;
 	}
 	
 	public String getTemplateName(){
-		return template.name;
+		return this.template.name;
 	}
 	
 	public int getLineNumber(){
-		return startLine;
+		return this.startLine;
 	}
 
 	public String getTemplateSrc() {
-		return template.source;
+		return this.template.source;
 	}
 
 	/**
@@ -43,7 +43,7 @@ public class JapidCompilationException extends RuntimeException {
 	 * @return
 	 */
 	public String getLocation() {
-		return template.name + ": line " + startLine;
+		return this.template.name + ": line " + this.startLine;
 	}
 
 }

@@ -4,11 +4,11 @@ public class CacheablePlayActionRunnerImpl1 extends CacheablePlayActionRunner{
 	RunAction runAction;
 	
 	public RunAction getRunAction() {
-		return runAction;
+		return this.runAction;
 	}
 
-	public void setRunAction(RunAction runAction) {
-		this.runAction = runAction;
+	public void setRunAction(RunAction _runAction) {
+		this.runAction = _runAction;
 	}
 
 	public CacheablePlayActionRunnerImpl1(String ttl) {
@@ -21,7 +21,7 @@ public class CacheablePlayActionRunnerImpl1 extends CacheablePlayActionRunner{
 
 	@Override
 	protected JapidResult runPlayAction() {
-		return runAction.runPlayAction();
+		return this.runAction.runPlayAction();
 	}
 
 }

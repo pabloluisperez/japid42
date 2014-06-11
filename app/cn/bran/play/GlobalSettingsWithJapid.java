@@ -124,8 +124,9 @@ public class GlobalSettingsWithJapid extends GlobalSettings {
 	public Action<?> onRequest(Request request, final Method actionMethod) {
 		final String actionName = actionMethod.getDeclaringClass().getName() + "." + actionMethod.getName();
 		final Map<String, String> threadData = JapidController.threadData.get();
-		if (!cacheResponse) {
+		if (!this.cacheResponse) {
 			return new Action.Simple() {
+				@Override
 				public Promise<SimpleResult> call(Context ctx) throws Throwable {
 					// pass the FQN to the japid controller to determine the
 					// template to use
@@ -134,7 +135,7 @@ public class GlobalSettingsWithJapid extends GlobalSettings {
 					// assuming the delegate call will take place in the same
 					// thread
 					threadData.put(ACTION_METHOD, actionName);
-					Promise<SimpleResult> call = delegate.call(ctx);
+					Promise<SimpleResult> call = this.delegate.call(ctx);
 					threadData.remove(ACTION_METHOD);
 					return call;
 				}
@@ -142,6 +143,7 @@ public class GlobalSettingsWithJapid extends GlobalSettings {
 		}
 
 		return new Action<Cached>() {
+			@Override
 			public Promise<SimpleResult> call(Context ctx) {
 				try {
 					beforeActionInvocation(ctx, actionMethod);
@@ -164,7 +166,7 @@ public class GlobalSettingsWithJapid extends GlobalSettings {
 					if (result == null) {
 						// pass the action name hint to japid controller
 						threadData.put(ACTION_METHOD, actionName);
-						Promise<SimpleResult> ps = delegate.call(ctx);
+						Promise<SimpleResult> ps = this.delegate.call(ctx);
 						threadData.remove(ACTION_METHOD);
 
 						if (!StringUtils.isEmpty(key) && duration > 0) {
@@ -200,7 +202,7 @@ public class GlobalSettingsWithJapid extends GlobalSettings {
 
 	@Override
 	public Handler onRouteRequest(RequestHeader request) {
-		if (useJaxrs) {
+		if (this.useJaxrs) {
 //			if (_app.isDev())
 //				JapidFlags.debug("route with Japid router");
 
@@ -351,17 +353,17 @@ public class GlobalSettingsWithJapid extends GlobalSettings {
 	 * @return the useJaxrs
 	 */
 	public boolean isUseJaxrs() {
-		return useJaxrs;
+		return this.useJaxrs;
 	}
 
 	/**
 	 * set to use Jax-RS protocol based routing mechanism
 	 * 
-	 * @param useJaxrs
+	 * @param _useJaxrs
 	 *            the useJaxrs to set
 	 */
-	public void setUseJapidRouting(boolean useJaxrs) {
-		this.useJaxrs = useJaxrs;
+	public void setUseJapidRouting(boolean _useJaxrs) {
+		this.useJaxrs = _useJaxrs;
 	}
 
 	/**

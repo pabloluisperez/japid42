@@ -39,10 +39,10 @@ public abstract class CacheablePlayActionRunner extends CacheableRunner {
 //		}
 	}
 	
-	public CacheablePlayActionRunner(String ttl, Class<? extends JapidController> controllerClass, String actionName, Object... args) {
-		this.controllerClass = controllerClass;
-		this.actionName = actionName;
-		Object[] fullArgs = buildCacheKeyParts(controllerClass, actionName, args);
+	public CacheablePlayActionRunner(String ttl, Class<? extends JapidController> _controllerClass, String _actionName, Object... args) {
+		this.controllerClass = _controllerClass;
+		this.actionName = _actionName;
+		Object[] fullArgs = buildCacheKeyParts(_controllerClass, _actionName, args);
 		super.init(ttl, fullArgs);
 		
 		//		Object[] fullArgs = new Object[args.length + 2];
@@ -68,7 +68,7 @@ public abstract class CacheablePlayActionRunner extends CacheableRunner {
 	@Override
 	protected RenderResult render() {
 		Map<String, String> threadData = JapidController.threadData.get();
-		threadData.put(GlobalSettingsWithJapid.ACTION_METHOD, controllerClass.getName() + "." + actionName);
+		threadData.put(GlobalSettingsWithJapid.ACTION_METHOD, this.controllerClass.getName() + "." + this.actionName);
 		JapidResult jr = runPlayAction();
 		threadData.remove(GlobalSettingsWithJapid.ACTION_METHOD);
 		RenderResult rr = jr.getRenderResult();
@@ -78,8 +78,9 @@ public abstract class CacheablePlayActionRunner extends CacheableRunner {
 	/**
 	 * @return
 	 */
+	@Override
 	protected boolean shouldCache() {
-		fillCacheFor(controllerClass, actionName);
+		fillCacheFor(this.controllerClass, this.actionName);
 		return super.shouldCache();
 	}
 
@@ -134,17 +135,17 @@ public abstract class CacheablePlayActionRunner extends CacheableRunner {
 
 	/**
 	 * @param class1
-	 * @param actionName
+	 * @param _actionName
 	 */
-	private void fillCacheFor(Class<? extends JapidController> class1, String actionName) {
+	private void fillCacheFor(Class<? extends JapidController> class1, String _actionName) {
 		String className = class1.getName();
-		String cacheForKey = className + "_" + actionName;
+		String cacheForKey = className + "_" + _actionName;
 		Integer cacheForVal = (Integer) JapidRenderer.getCache().get(cacheForKey);
 		if (cacheForVal == null) {
 			// the cache has not been filled up yet.
 			Method[] mths = class1.getDeclaredMethods();
 			for (Method m : mths) {
-				if (m.getName().equalsIgnoreCase(actionName) && Modifier.isPublic(m.getModifiers())) {
+				if (m.getName().equalsIgnoreCase(_actionName) && Modifier.isPublic(m.getModifiers())) {
 						Cached cacheFor = m.getAnnotation(Cached.class);
 						if (cacheFor == null) {
 							// well no annotation level cache spec

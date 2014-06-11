@@ -1,9 +1,6 @@
 package cn.bran.japid.tags.streaming;
 
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 
 public class Each extends cn.bran.japid.template.JapidTemplateBaseStreaming {

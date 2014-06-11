@@ -15,7 +15,7 @@ import cn.bran.play.routing.RouteEntry;
 //
 public class dev404 extends cn.bran.play.JapidTemplateBase
 {
-	public static final String sourceTemplate = "japidviews/dev404.html";
+	public static final String sourceTemplate1 = "japidviews/dev404.html";
 	{
 		putHeader("Content-Type", "text/html; charset=utf-8");
 		setContentType("text/html; charset=utf-8");
@@ -24,11 +24,11 @@ public class dev404 extends cn.bran.play.JapidTemplateBase
 // - add implicit fields with Play
 boolean hasHttpContext = play.mvc.Http.Context.current.get() != null ? true : false;
 
-	final Request request = hasHttpContext? Implicit.request() : null;
-	final Response response = hasHttpContext ? Implicit.response() : null;
-	final Session session = hasHttpContext ? Implicit.session() : null;
-	final Flash flash = hasHttpContext ? Implicit.flash() : null;
-	final Lang lang = hasHttpContext ? Implicit.lang() : null;
+	final Request request = this.hasHttpContext? Implicit.request() : null;
+	final Response response = this.hasHttpContext ? Implicit.response() : null;
+	final Session session = this.hasHttpContext ? Implicit.session() : null;
+	final Flash flash = this.hasHttpContext ? Implicit.flash() : null;
+	final Lang lang = this.hasHttpContext ? Implicit.lang() : null;
 	final play.Play _play = new play.Play(); 
 
 // - end of implicit fields with Play 
@@ -52,20 +52,20 @@ boolean hasHttpContext = play.mvc.Http.Context.current.get() != null ? true : fa
 		setArgNames(argNames);
 		setArgTypes(argTypes);
 		setArgDefaults(argDefaults);
-		setSourceTemplate(sourceTemplate);
+		setSourceTemplate(sourceTemplate1);
 	}
 ////// end of named args stuff
 
 	private play.mvc.Http.RequestHeader reqheader; // line 2
 	private List<scala.Tuple3<String, String, String>> routes; // line 2
 	private List<RouteEntry> jaxRoutes; // line 2
-	public cn.bran.japid.template.RenderResult render(play.mvc.Http.RequestHeader reqheader,List<scala.Tuple3<String, String, String>> routes,List<RouteEntry> jaxRoutes) {
-		this.reqheader = reqheader;
-		this.routes = routes;
-		this.jaxRoutes = jaxRoutes;
+	public cn.bran.japid.template.RenderResult render(play.mvc.Http.RequestHeader _reqheader,List<scala.Tuple3<String, String, String>> _routes,List<RouteEntry> _jaxRoutes) {
+		this.reqheader = _reqheader;
+		this.routes = _routes;
+		this.jaxRoutes = _jaxRoutes;
 		long __t = -1;
 		try {super.layout();} catch (RuntimeException e) { super.handleException(e);} // line 2
-		return new cn.bran.japid.template.RenderResultPartial(getHeaders(), getOut(), __t, actionRunners, sourceTemplate);
+		return new cn.bran.japid.template.RenderResultPartial(getHeaders(), getOut(), __t, this.actionRunners, sourceTemplate1);
 	}
 
 	public static cn.bran.japid.template.RenderResult apply(play.mvc.Http.RequestHeader reqheader,List<scala.Tuple3<String, String, String>> routes,List<RouteEntry> jaxRoutes) {
@@ -73,7 +73,7 @@ boolean hasHttpContext = play.mvc.Http.Context.current.get() != null ? true : fa
 	}
 
 	@Override protected void doLayout() {
-		beginDoLayout(sourceTemplate);
+		beginDoLayout(sourceTemplate1);
 //------
 ;// line 1
 		;// line 1
@@ -186,7 +186,7 @@ boolean hasHttpContext = play.mvc.Http.Context.current.get() != null ? true : fa
 "\n" + 
 "		<p id=\"detail\">\n" + 
 "			For request '");// line 6
-		p(reqheader);// line 115
+		p(this.reqheader);// line 115
 		p("'\n" + 
 "		</p>\n" + 
 "		\n" + 
@@ -195,14 +195,15 @@ boolean hasHttpContext = play.mvc.Http.Context.current.get() != null ? true : fa
 "        	</h2>\n" + 
 "\n" + 
 "		");// line 115
-		if(asBoolean(jaxRoutes)) {// line 122
+		if(asBoolean(this.jaxRoutes)) {// line 122
 		p("		    <h3>\n" + 
 "    			Routes derived from JAX-RS annotations:\n" + 
 "        	</h3>\n" + 
 "            <div>\n" + 
 "    			");// line 122
 		final Each _Each0 = new Each(getOut()); _Each0.setOut(getOut()); _Each0.render(// line 127
-jaxRoutes, new Each.DoBody<RouteEntry>(){ // line 127
+this.jaxRoutes, new Each.DoBody<RouteEntry>(){ // line 127
+@Override
 public void render(final RouteEntry r, final int _size, final int _index, final boolean _isOdd, final String _parity, final boolean _isFirst, final boolean _isLast) { // line 127
 // line 127
 		p("    				<pre><span class=\"line\">");// line 127
@@ -221,13 +222,13 @@ public void render(final RouteEntry r, final int _size, final int _index, final 
 StringBuilder oriBuffer;
 @Override
 public void setBuffer(StringBuilder sb) {
-	oriBuffer = getOut();
+	this.oriBuffer = getOut();
 	setOut(sb);
 }
 
 @Override
 public void resetBuffer() {
-	setOut(oriBuffer);
+	setOut(this.oriBuffer);
 }
 
 }
@@ -240,14 +241,15 @@ public void resetBuffer() {
 "    		</h3>\n" + 
 "        ");// line 131
 		}// line 135
-		if(asBoolean(routes)) {// line 137
+		if(asBoolean(this.routes)) {// line 137
 		p("		    <h3>\n" + 
 "    			Routes defined in routes file:\n" + 
 "        	</h3>\n" + 
 "            <div>\n" + 
 "    			");// line 137
 		final Each _Each1 = new Each(getOut()); _Each1.setOut(getOut()); _Each1.render(// line 142
-routes, new Each.DoBody<scala.Tuple3>(){ // line 142
+this.routes, new Each.DoBody<scala.Tuple3>(){ // line 142
+@Override
 public void render(final scala.Tuple3 r, final int _size, final int _index, final boolean _isOdd, final String _parity, final boolean _isFirst, final boolean _isLast) { // line 142
 // line 142
 		p("    				<pre><span class=\"line\">");// line 142
@@ -266,13 +268,13 @@ public void render(final scala.Tuple3 r, final int _size, final int _index, fina
 StringBuilder oriBuffer;
 @Override
 public void setBuffer(StringBuilder sb) {
-	oriBuffer = getOut();
+	this.oriBuffer = getOut();
 	setOut(sb);
 }
 
 @Override
 public void resetBuffer() {
-	setOut(oriBuffer);
+	setOut(this.oriBuffer);
 }
 
 }
@@ -295,7 +297,7 @@ public void resetBuffer() {
 "\n" + 
 "\n");// line 150
 		
-		endDoLayout(sourceTemplate);
+		endDoLayout(sourceTemplate1);
 	}
 
 }

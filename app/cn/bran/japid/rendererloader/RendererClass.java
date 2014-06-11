@@ -32,28 +32,28 @@ public class RendererClass implements Serializable{
 //		this.cl = cl;
 //	}
 	public Class<? extends JapidTemplateBaseWithoutPlay> getClz() {
-		return clz;
+		return this.clz;
 	}
-	public void setClz(Class<? extends JapidTemplateBaseWithoutPlay> clz) {
-		this.clz = clz;
-		if (clz == null)
+	public void setClz(Class<? extends JapidTemplateBaseWithoutPlay> _clz) {
+		this.clz = _clz;
+		if (_clz == null)
 			this.setConstructor(null);
 		else 
 			try {
-				if (!clz.getName().contains("$"))
-					this.setConstructor(clz.getConstructor(StringBuilder.class));
+				if (!_clz.getName().contains("$"))
+					this.setConstructor(_clz.getConstructor(StringBuilder.class));
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 	}
 	public String getClassName() {
-		return className;
+		return this.className;
 	}
-	public void setClassName(String className) {
-		this.className = className;
+	public void setClassName(String _className) {
+		this.className = _className;
 	}
 	public String getJavaSourceCode() {
-		return javaSourceCode;
+		return this.javaSourceCode;
 	}
 	public void setJavaSourceCode(String sourceCode) {
 		this.javaSourceCode = sourceCode;
@@ -63,10 +63,10 @@ public class RendererClass implements Serializable{
 		this.lastUpdated = lastUpdates;
 	}
 	public byte[] getBytecode() {
-		return bytecode;
+		return this.bytecode;
 	}
-	public void setBytecode(byte[] bytecode) {
-		this.bytecode = bytecode;
+	public void setBytecode(byte[] _bytecode) {
+		this.bytecode = _bytecode;
 	}
 	
 	public void clear() {
@@ -88,13 +88,13 @@ public class RendererClass implements Serializable{
 	 * @return the srcFile
 	 */
 	private File getScriptFile() {
-		return scriptFile;
+		return this.scriptFile;
 	}
 	/**
 	 * @return the javaSourceCode
 	 */
 	public String getJapidSourceCode() {
-		return japidSourceCode;
+		return this.japidSourceCode;
 	}
 	/**
 	 * @param javaSourceCode the javaSourceCode to set
@@ -106,7 +106,7 @@ public class RendererClass implements Serializable{
 	 * @return the lastUpdated
 	 */
 	public long getLastUpdated() {
-		return lastUpdated;
+		return this.lastUpdated;
 	}
 
 	/**
@@ -120,10 +120,10 @@ public class RendererClass implements Serializable{
 		String line = splitSrc[lineNumber - 1];
 		// can we have a line marker?
 		int lineMarker = line.lastIndexOf("// line ");
-		if (lineMarker > 0) 
+		if (lineMarker > 0){ 
 			return Integer.parseInt(line.substring(lineMarker + 8).trim());
-		else
-			return -1;	
+		}
+		return -1;	
 
 	}
 	/**
@@ -137,7 +137,7 @@ public class RendererClass implements Serializable{
 	 * @return the constructor
 	 */
 	public Constructor<? extends JapidTemplateBaseWithoutPlay> getConstructor() {
-		return constructor;
+		return this.constructor;
 	}
 	/**
 	 * @author Bing Ran (bing.ran@hotmail.com)
@@ -150,7 +150,7 @@ public class RendererClass implements Serializable{
 	 * @return the lastCompiled
 	 */
 	public long getLastCompiled() {
-		return lastCompiled;
+		return this.lastCompiled;
 	}
 	/**
 	 * @author Bing Ran (bing.ran@hotmail.com)
@@ -163,7 +163,7 @@ public class RendererClass implements Serializable{
 	 * @return the lastDefined
 	 */
 	public long getLastDefined() {
-		return lastDefined;
+		return this.lastDefined;
 	}
 
 	@Override
@@ -174,26 +174,24 @@ public class RendererClass implements Serializable{
 	 * @return the scripTimestamp
 	 */
 	public long getScriptTimestamp() {
-		return scriptTimestamp;
+		return this.scriptTimestamp;
 	}
 	/**
 	 * @param scripTimestamp the scripTimestamp to set
 	 */
-	public void setScriptTimestamp(long scriptTimestamp) {
-		this.scriptTimestamp = scriptTimestamp;
+	public void setScriptTimestamp(long _scriptTimestamp) {
+		this.scriptTimestamp = _scriptTimestamp;
 	}
 	/**
 	 * @author Bing Ran (bing.ran@hotmail.com)
 	 * @return
 	 */
 	public String getScriptPath() {
-		File scriptFile = getScriptFile();
-		if (scriptFile != null && scriptFile.exists()) {
-			return scriptFile.getPath();
+		File scriptFile1 = getScriptFile();
+		if (scriptFile1 != null && scriptFile1.exists()) {
+			return scriptFile1.getPath();
 		}
-		else {
-			return className;
-		}
+		return this.className;
 	}
 	/**
 	 * set the contributor. Options are: "jar"
@@ -216,9 +214,10 @@ public class RendererClass implements Serializable{
 	 * @return
 	 */
 	public boolean fromJar() {
-		if (this.contributor != null && contributor.startsWith("jar:"))
+		if (this.contributor != null && this.contributor.startsWith("jar:")){
 			return true;
-		else return false;
+		}
+		return false;
 	}
 
 }

@@ -47,12 +47,12 @@ public class RouterMethod {
 		for (Annotation a : annotations) {
 			if (a instanceof GET || a instanceof POST || a instanceof PUT || a instanceof DELETE || a instanceof HEAD
 					|| a instanceof OPTIONS)
-				httpMethodAnnotations.add(a);
+				this.httpMethodAnnotations.add(a);
 		}
-		meth = m;
+		this.meth = m;
 		Consumes consumes = m.getAnnotation(Consumes.class);
 		if (consumes != null) {
-			consumeTypes = consumes.value();
+			this.consumeTypes = consumes.value();
 		}
 
 		OptionalExt artExt = m.getAnnotation(OptionalExt.class);
@@ -64,27 +64,27 @@ public class RouterMethod {
 		// now parse the path spec
 		Path p = m.getAnnotation(Path.class);
 		if (p != null && p.value().length() > 0) {
-			pathSpec = pathPrefix + JaxrsRouter.prefixSlash(p.value());
-			pathSpecPattern = Pattern.compile(pathSpec.replaceAll(JaxrsRouter.urlParamCapture, "\\\\{(.*)\\\\}"));
+			this.pathSpec = pathPrefix + JaxrsRouter.prefixSlash(p.value());
+			this.pathSpecPattern = Pattern.compile(this.pathSpec.replaceAll(JaxrsRouter.urlParamCapture, "\\\\{(.*)\\\\}"));
 
-			if (pathSpec.contains("{") && pathSpec.contains("}")) {
-				List<RegMatch> rootParamNameMatches = RegMatch.findAllMatchesIn(pathSpecPattern, pathSpec);
+			if (this.pathSpec.contains("{") && this.pathSpec.contains("}")) {
+				List<RegMatch> rootParamNameMatches = RegMatch.findAllMatchesIn(this.pathSpecPattern, this.pathSpec);
 				List<String> rootParamNames = new ArrayList<String>();
 				for (RegMatch rm : rootParamNameMatches) {
 					rootParamNames.addAll(rm.subgroups);
 				}
 				for (String s : rootParamNames) {
 					if (s != null)
-						paramSpecList.add(new ParamSpec(s));
+						this.paramSpecList.add(new ParamSpec(s));
 				}
 
-				if (parameterAnnotations.length < paramSpecList.size()) {
+				if (parameterAnnotations.length < this.paramSpecList.size()) {
 					throw new RuntimeException(
 							"param number does not match that of the param captures in the path annotation pattern");
 				}
 				int pc = 0;
 				for (Annotation[] paramAnnos : parameterAnnotations) {
-					if (paramAnnos.length == 0 && !autoRouting) {
+					if (paramAnnos.length == 0 && !this.autoRouting) {
 						throw new RuntimeException(
 								"in none-auto-routing mode: no capturing annotations (@PathParam/@QueryParam) for the parameter at the method position: "
 										+ m.getName() + ":" + pc);
@@ -96,7 +96,7 @@ public class RouterMethod {
 							String pname = ((PathParam) ann).value();
 							boolean hasName = false;
 							// fill the path param type
-							for (ParamSpec pspec : paramSpecList) {
+							for (ParamSpec pspec : this.paramSpecList) {
 								if (pspec.name.equals(pname)) {
 									Class<?> type = paramTypes[pc];
 									pspec.type = type;
@@ -124,7 +124,7 @@ public class RouterMethod {
 					pc++;
 				}
 				// check that all path param has been set up with proper types
-				for (ParamSpec pspec : paramSpecList) {
+				for (ParamSpec pspec : this.paramSpecList) {
 					if (pspec.type == null) {
 						throw new RuntimeException("cannot match the path param with the parameter list of method: "
 								+ this.meth);
@@ -136,7 +136,7 @@ public class RouterMethod {
 			// auto-routing mechanism:
 			// 1. use method name as the first part
 			this.autoRouting = true;
-			pathSpec = pathPrefix + "\\." + m.getName();
+			this.pathSpec = pathPrefix + "\\." + m.getName();
 
 			int pos = 0; // path param position
 			int ppos = 0; // natural parameter
@@ -156,24 +156,24 @@ public class RouterMethod {
 					String s = "_" + pos++;
 					ParamSpec ps = new ParamSpec(s);
 					ps.type = paramTypes[ppos];
-					paramSpecList.add(ps);
-					pathSpec += "/" + "{" + s + "}";
+					this.paramSpecList.add(ps);
+					this.pathSpec += "/" + "{" + s + "}";
 				}
 				ppos++;
 			}
-			pathSpecPattern = Pattern.compile(pathSpec.replaceAll(JaxrsRouter.urlParamCapture, "\\\\{(.*)\\\\}"));
+			this.pathSpecPattern = Pattern.compile(this.pathSpec.replaceAll(JaxrsRouter.urlParamCapture, "\\\\{(.*)\\\\}"));
 		}
 
-		valueExtractionPattern = Pattern.compile(pathSpec.replaceAll(JaxrsRouter.urlParamCapture, "(.*)"));
+		this.valueExtractionPattern = Pattern.compile(this.pathSpec.replaceAll(JaxrsRouter.urlParamCapture, "(.*)"));
 
 		Produces produces = m.getAnnotation(Produces.class);
 		if (produces == null)
-			produce = null;
+			this.produce = null;
 
 		else if (produces.value().length != 1) {
 			throw new RuntimeException("Currently the PRODUCES annotation can only take one type of result.");
 		} else {
-			produce = produces.value()[0];
+			this.produce = produces.value()[0];
 		}
 
 	}
@@ -188,23 +188,23 @@ public class RouterMethod {
 
 	public Object[] extractArguments(play.mvc.Http.RequestHeader r) {
 		String path = r.path();
-		if (path.endsWith(withExtension))
-			path = path.substring(0, path.lastIndexOf(withExtension));
+		if (path.endsWith(this.withExtension))
+			path = path.substring(0, path.lastIndexOf(this.withExtension));
 
-		List<RegMatch> rootParamValueMatches = RegMatch.findAllMatchesIn(valueExtractionPattern, path);
+		List<RegMatch> rootParamValueMatches = RegMatch.findAllMatchesIn(this.valueExtractionPattern, path);
 		List<String> rootParamValues = new ArrayList<String>();
 		for (RegMatch rm : rootParamValueMatches) {
 			rootParamValues.addAll(rm.subgroups);
 		}
 
-		if (rootParamValues.size() != paramSpecList.size()) {
+		if (rootParamValues.size() != this.paramSpecList.size()) {
 			throw new RuntimeException("param spec number does not match that from URI capturing. Spec contains: "
-					+ paramSpecList.size() + " while the URI contains: " + rootParamValues.size() + ". The route entry is: " + this.toString());
+					+ this.paramSpecList.size() + " while the URI contains: " + rootParamValues.size() + ". The route entry is: " + this.toString());
 		}
 
 		Map<String, Object> args = new java.util.HashMap<String, Object>();
 		int c = 0;
-		for (ParamSpec paramSpec : paramSpecList) {
+		for (ParamSpec paramSpec : this.paramSpecList) {
 			String name = paramSpec.name;
 			String value = rootParamValues.get(c++);
 			if (!paramSpec.formatPattern.matcher(value).matches()) {
@@ -221,7 +221,7 @@ public class RouterMethod {
 		//
 		Object[] argValues = new Object[0];
 		List<Object> argVals = new ArrayList<Object>();
-		Annotation[][] annos = meth.getParameterAnnotations();
+		Annotation[][] annos = this.meth.getParameterAnnotations();
 
 		c = 0;
 		int pos = 0;
@@ -241,23 +241,23 @@ public class RouterMethod {
 					argVals.add(v);
 				else
 					throw new IllegalArgumentException("can not find annotation value for argument "
-							+ pathParam.value() + "in " + meth.getDeclaringClass() + "#" + meth);
+							+ pathParam.value() + "in " + this.meth.getDeclaringClass() + "#" + this.meth);
 			} else if (queryParam != null) {
 				String name = queryParam.value();
 				String queryString = r.getQueryString(name); // XXX should this
 																// be of
 																// String[]?
-				argVals.add(convertArgType(c, name, queryString, meth.getParameterTypes()[c]));
-			} else if (autoRouting) {
+				argVals.add(convertArgType(c, name, queryString, this.meth.getParameterTypes()[c]));
+			} else if (this.autoRouting) {
 				Object v = args.get("_" + pos++);
 				if (v != null)
 					argVals.add(v);
 				else
 					throw new IllegalArgumentException("can not find value for param No. " + c + " in "
-							+ meth.getDeclaringClass() + "#" + meth);
+							+ this.meth.getDeclaringClass() + "#" + this.meth);
 			} else
 				throw new IllegalArgumentException("can not find how to map the value for an argument for method:"
-						+ meth.getDeclaringClass() + "#" + meth + ". The parameter position is(0-based): " + c);
+						+ this.meth.getDeclaringClass() + "#" + this.meth + ". The parameter position is(0-based): " + c);
 			c++;
 		}
 		argValues = argVals.toArray(argValues);
@@ -297,7 +297,7 @@ public class RouterMethod {
 		} else {
 			throw new RuntimeException(
 					"this version supports capturing primitive parameters, their object wrappers or strings. This param is not of primitive type: "
-							+ meth.getName() + ":" + c + "(0-based)");
+							+ this.meth.getName() + ":" + c + "(0-based)");
 		}
 		return val;
 	}
@@ -309,10 +309,10 @@ public class RouterMethod {
 	 * @return
 	 */
 	public boolean containsConsumeType(String contentType) {
-		if (consumeTypes.length == 0) {
+		if (this.consumeTypes.length == 0) {
 			return true;
 		} else {
-			for (String c : consumeTypes) {
+			for (String c : this.consumeTypes) {
 				if (c.equals(contentType))
 					return true;
 			}
@@ -326,18 +326,18 @@ public class RouterMethod {
 	 * @return
 	 */
 	public boolean matchURI(String uri) {
-		if (pathSpec.equals(uri))
+		if (this.pathSpec.equals(uri))
 			return true;
 		else
-			return valueExtractionPattern.matcher(uri).matches();
+			return this.valueExtractionPattern.matcher(uri).matches();
 	}
 
 	public boolean supportHttpMethod(String ms) {
 		Class<? extends Annotation> httpMethodClass = RouterUtils.findHttpMethodAnnotation(ms.toUpperCase());
-		if (httpMethodAnnotations.size() == 0)
+		if (this.httpMethodAnnotations.size() == 0)
 			return true; // take any
 
-		for (Annotation a : httpMethodAnnotations) {
+		for (Annotation a : this.httpMethodAnnotations) {
 			if (httpMethodClass.isInstance(a))
 				return true;
 		}
@@ -353,16 +353,16 @@ public class RouterMethod {
 	}
 
 	private String getAction() {
-		return meth.getDeclaringClass().getCanonicalName() + "." + meth.getName() + "(" + getParamListString() + ")" + (produce != null? " : " + produce : "");
+		return this.meth.getDeclaringClass().getCanonicalName() + "." + this.meth.getName() + "(" + getParamListString() + ")" + (this.produce != null? " : " + this.produce : "");
 	}
 
 	private String getPath() {
-		return pathSpec.replaceAll("\\\\", "") + withExtension;
+		return this.pathSpec.replaceAll("\\\\", "") + this.withExtension;
 	}
 
 	private String getVerb() {
 		String meths = "";
-		for (Annotation an : httpMethodAnnotations) {
+		for (Annotation an : this.httpMethodAnnotations) {
 			String string = an.toString();
 			// clean it
 			for (int i = 0; i < string.length(); i++) {
@@ -379,7 +379,7 @@ public class RouterMethod {
 	}
 	
 	private String getParamListString() {
-		return StringUtils.join(paramSpecList, ",");
+		return StringUtils.join(this.paramSpecList, ",");
 	}
 
 	/**

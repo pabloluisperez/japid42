@@ -32,11 +32,11 @@ public class RenderResultBundler implements Serializable {
 	long renderTime; // in ms, for recording the time to render.
 	private Map<String, String> headers = new HashMap<String, String>();
 
-	public RenderResultBundler(Map<String, String> headers , StringBundler content, long renderTime) {
+	public RenderResultBundler(Map<String, String> _headers , StringBundler _content, long _renderTime) {
 		super();
-		this.content = content;
-		this.renderTime = renderTime;
-		this.headers = headers;
+		this.content = _content;
+		this.renderTime = _renderTime;
+		this.headers = _headers;
 	}
 
 	/**
@@ -46,7 +46,7 @@ public class RenderResultBundler implements Serializable {
 	 * @return the fully interpolated content
 	 */
 	public StringBundler getContent() {
-		return content;
+		return this.content;
 	}
 
 	public long getRenderTime() {
@@ -59,12 +59,10 @@ public class RenderResultBundler implements Serializable {
 
 	@Override
 	public String toString() {
-		if (content != null) {
-			return content.toString();
+		if (this.content != null) {
+			return this.content.toString();
 		}
-		else {
-			return "RenderResult: null";
-		}
+		return "RenderResult: null";
 	}
 
 	public Map<String, String> getHeaders() {

@@ -13,8 +13,6 @@
  */
 package cn.bran.japid.compiler;
 
-import japa.parser.ast.body.Parameter;
-
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -98,7 +96,7 @@ public abstract class JapidAbstractCompiler {
 	private String templateShortName;
 
 	public void compile(JapidTemplate t) {
-		template = t;
+		this.template = t;
 		String tname = t.name;
 		int lastSlash = tname.lastIndexOf("/");
 		if (lastSlash >= 0) {
@@ -118,17 +116,17 @@ public abstract class JapidAbstractCompiler {
 		// Parse
 		loop: for (;;) {
 
-			if (doNextScan) {
-				stateBeforePreviousState = previousState;
-				previousState = state;
-				state = parser.nextToken();
+			if (this.doNextScan) {
+				this.stateBeforePreviousState = this.previousState;
+				this.previousState = this.state;
+				this.state = this.parser.nextToken();
 			} else {
-				doNextScan = true;
+				this.doNextScan = true;
 			}
 
-			String token = parser.getToken();
+			String token = this.parser.getToken();
 
-			switch (state) {
+			switch (this.state) {
 			case EOF:
 				break loop;
 			case PLAIN:
@@ -144,7 +142,7 @@ public abstract class JapidAbstractCompiler {
 				closingBrace(token);
 				break;
 			case SCRIPT_LINE:
-				if (previousState == Token.PLAIN && stateBeforePreviousState == Token.SCRIPT_LINE) {
+				if (this.previousState == Token.PLAIN && this.stateBeforePreviousState == Token.SCRIPT_LINE) {
 					String spacer = this.getTemplateClassMetaData().removeLastSingleEmptyLine();
 					if (spacer != null) {
 						Tag currentScope = this.tagsStack.peek();
@@ -175,21 +173,29 @@ public abstract class JapidAbstractCompiler {
 				action(token, true);
 				break;
 			case COMMENT:
-				skipLineBreak = true;
+				this.skipLineBreak = true;
 				break;
 			case START_TAG:
 				startTag(buildTag(token));
 				break;
 			case END_TAG:
 				String tagName = token.trim();
-				if (tagsStack.isEmpty()) {
-					throw new JapidCompilationException(template, parser.getLineNumber(), "#{/" + tagName + "} is not opened.");
+				if (this.tagsStack.isEmpty()) {
+					throw new JapidCompilationException(this.template, this.parser.getLineNumber(), "#{/" + tagName + "} is not opened.");
 				}
 				Tag tag = popStack();
 				endTag(tag);
 				break;
 			case TEMPLATE_ARGS:
 				templateArgs(token);
+				break;
+			case ACTION_CURLY:
+				break;
+			case EXPR_NATURAL:
+				break;
+			case EXPR_WING:
+				break;
+			default:
 				break;
 			}
 		}
@@ -200,7 +206,7 @@ public abstract class JapidAbstractCompiler {
 	 */
 	private Tag popStack() {
 		// tagsStackShadow.pop();
-		return tagsStack.pop();
+		return this.tagsStack.pop();
 	}
 
 	protected void closingBrace(String token) {
@@ -211,7 +217,7 @@ public abstract class JapidAbstractCompiler {
 
 	protected void plain(String token) {
 		String text = token.replace("\\", "\\\\").replaceAll("\"", "\\\\\"");
-		if (skipLineBreak && text.startsWith(NEW_LINE)) {
+		if (this.skipLineBreak && text.startsWith(NEW_LINE)) {
 			text = text.substring(1);
 		}
 
@@ -221,9 +227,7 @@ public abstract class JapidAbstractCompiler {
 			String r = text.trim();
 			if (r.length() == 0)
 				return;
-			else {
-				text = text.trim();
-			}
+			text = text.trim();
 		}
 		String lines = composeValidMultiLines(text);
 		String ref = this.getTemplateClassMetaData().addStaticText(lines, text);
@@ -257,7 +261,7 @@ public abstract class JapidAbstractCompiler {
 		String result = "";
 		for (int i = 0; i < lines.length; i++) {
 			String line = lines[i];
-			if (line.length() > 0 && (int) line.charAt(line.length() - 1) == 13) {
+			if (line.length() > 0 && line.charAt(line.length() - 1) == 13) {
 				// remove the last newline
 				line = line.substring(0, line.length() - 1);
 			}
@@ -289,7 +293,7 @@ public abstract class JapidAbstractCompiler {
 		// print(NEW_LINE);
 		Tag currentScope = this.tagsStack.peek();
 		currentScope.bodyTextList.add("\t\t");
-		currentLine++;
+		this.currentLine++;
 	}
 
 	/**
@@ -314,7 +318,7 @@ public abstract class JapidAbstractCompiler {
 		print(text);
 		println();
 		int i = 0;
-		while (i++ < indentLevel) {
+		while (i++ < this.indentLevel) {
 			print("\t");
 		}
 	}
@@ -324,14 +328,14 @@ public abstract class JapidAbstractCompiler {
 			print(makeLineMarker(line));
 		}
 
-		template.linesMatrix.put(currentLine, line);
+		this.template.linesMatrix.put(this.currentLine, line);
 	}
 
 	public String makeLineMarker(int line) {
 		if (line <= 0)
 			return "";
 
-		return DirUtil.LINE_MARKER + line + DirUtil.OF + templateShortName;
+		return DirUtil.LINE_MARKER + line + DirUtil.OF + this.templateShortName;
 	}
 
 	protected void scriptline(String token) {
@@ -343,7 +347,7 @@ public abstract class JapidAbstractCompiler {
 	protected void script(String token) {
 		String[] lines = new String[] { token };
 		if (token.indexOf(NEW_LINE) > -1) {
-			lines = parser.getToken().split(NEW_LINE);
+			lines = this.parser.getToken().split(NEW_LINE);
 		}
 
 		for (int i = 0; i < lines.length; i++) {
@@ -403,7 +407,7 @@ public abstract class JapidAbstractCompiler {
 						getTemplateClassMetaData().superClass = tag.tagName;
 						getTemplateClassMetaData().superClassRenderArgs = tag.args;
 					} catch (RuntimeException e) {
-						throw new JapidCompilationException(template, parser.getLineNumber(), e.getMessage());
+						throw new JapidCompilationException(this.template, this.parser.getLineNumber(), e.getMessage());
 					}
 				}
 			} else if (startsWithIgnoreSpace(line, "contentType")) {
@@ -416,7 +420,7 @@ public abstract class JapidAbstractCompiler {
 				String headerkv = line.trim().substring("setHeader".length()).trim();
 				String[] split = headerkv.split("[ |\t]");
 				if (split.length < 2) {
-					throw new JapidCompilationException(template, parser.getLineNumber(), "setHeaader must take a key and a value string");
+					throw new JapidCompilationException(this.template, this.parser.getLineNumber(), "setHeaader must take a key and a value string");
 				}
 				String name = split[0];
 				String value = headerkv.substring(name.length()).trim();
@@ -444,19 +448,19 @@ public abstract class JapidAbstractCompiler {
 				if (args.trim().length() == 0)
 					args = "\"\"";
 				String logLine = "System.out.println(\"" + this.template.name.replace('\\', '/') + "(line "
-						+ (parser.getLineNumber() + i) + "): \" + " + args + ");";
+						+ (this.parser.getLineNumber() + i) + "): \" + " + args + ");";
 				println(logLine);
 			} else if (startsWithIgnoreSpace(line, "invoke")) {
 				String args = line.trim().substring("invoke".length()).trim().replace(";", "");
 				doActionInvokeDirective(args);
-				markLine(parser.getLineNumber() + i);
+				markLine(this.parser.getLineNumber() + i);
 				println();
 			} else if (startsWith(line, "a")) { // `a == `invoke, the a must be
 												// the first char to avoid
 												// collision
 				String args = line.substring(2).trim().replace(";", "");
 				doActionInvokeDirective(args);
-				markLine(parser.getLineNumber() + i);
+				markLine(this.parser.getLineNumber() + i);
 				println();
 			} else if (startsWithIgnoreSpace(line, "suppressNull") || line.trim().equals("suppressNull")) {
 				String npe = line.trim().substring("suppressNull".length()).trim().replace(";", "").replace("'", "").replace("\"", "");
@@ -505,18 +509,18 @@ public abstract class JapidAbstractCompiler {
 				String src;
 				try {
 					src = DirUtil.readFileAsString(target);
-					JapidTemplate template = new JapidTemplate(target, src);
+					JapidTemplate _template = new JapidTemplate(target, src);
 					JapidAbstractCompiler c = JapidTemplateTransformer.selectCompiler(src);
 					c.setUseWithPlay(getTemplateClassMetaData().useWithPlay);
-					c.compile(template);
-					String jsrc = template.javaSource;
+					c.compile(_template);
+					String jsrc = _template.javaSource;
 					getTemplateClassMetaData().merge(c.getTemplateClassMetaData());
 					println("/* include %s */", target);
 					String code = extractRenderingCode(jsrc);
 					println(code);
 					println("/* end of %s */", target);
 				} catch (Exception e) {
-					throw new JapidCompilationException(template, parser.getLineNumber() + i,
+					throw new JapidCompilationException(this.template, this.parser.getLineNumber() + i,
 							"The target of include does not exist: " + target + ". " + e);
 				}
 			} else if (line.trim().startsWith("noplay")) {
@@ -538,7 +542,7 @@ public abstract class JapidAbstractCompiler {
 				// template is play independent
 				getTemplateClassMetaData().setContentType(MimeTypeEnum.js.header);
 			} else if (line.trim().startsWith("verbatim")) {
-				parser.verbatim = true;
+				this.parser.verbatim = true;
 				Tag get = buildTagDirective(line);
 				get.hasBody = true;
 				startTag(get);
@@ -548,7 +552,7 @@ public abstract class JapidAbstractCompiler {
 				String clause = expr.substring(2);
 				if (JavaSyntaxTool.isIf(clause)) {
 					print(expr);
-					markLine(parser.getLineNumber() + i);
+					markLine(this.parser.getLineNumber() + i);
 					println();
 				} else if (JavaSyntaxTool.isOpenIf(clause)) {
 					handleOpenIf(i, expr);
@@ -589,7 +593,7 @@ public abstract class JapidAbstractCompiler {
 					expr = "} else if(" + (negative ? "!" : "") + "asBoolean(" + cleanExpr + ")) {";
 				}
 				print(expr);
-				markLine(parser.getLineNumber() + i);
+				markLine(this.parser.getLineNumber() + i);
 				println();
 			} else if (line.matches(OPEN_ELSE_IF_PATTERN_STRING)) {
 				// open
@@ -607,19 +611,19 @@ public abstract class JapidAbstractCompiler {
 							if (JavaSyntaxTool.isValidExpr(ex)){
 								//OK, the insider is a valid expression (better be boolean!)
 								// end previous if shadow and star a new one
-								Tag tagShadow = tagsStackShadow.peek();
+								Tag tagShadow = this.tagsStackShadow.peek();
 								if (tagShadow instanceof TagIf) {
-									tagsStackShadow.pop();
+									this.tagsStackShadow.pop();
 									// to close an open if
 									// start a new if
-									Tag.TagIf iftag = new Tag.TagIf(expr, parser.getLineNumber());
+									Tag.TagIf iftag = new Tag.TagIf(expr, this.parser.getLineNumber());
 									pushToStack(iftag);
 									expr = "} else if(" + ex + ")) {";
 									print(expr);
-									markLine(parser.getLineNumber() + i);
+									markLine(this.parser.getLineNumber() + i);
 									println();
 								} else {
-									throw new JapidCompilationException(template, parser.getLineNumber() + i,
+									throw new JapidCompilationException(this.template, this.parser.getLineNumber() + i,
 											"the open \"else if\" statement is not properly matched to a previous if");
 								}
 							} else {
@@ -633,18 +637,18 @@ public abstract class JapidAbstractCompiler {
 					throw new RuntimeException("JapidAbstractCompiler bug: Should never be here!");
 				}
 			} else if (line.matches(OPEN_ELSE_STRING)) {
-				Tag tagShadow = tagsStackShadow.peek();
+				Tag tagShadow = this.tagsStackShadow.peek();
 				if (tagShadow instanceof TagIf) {
-					tagsStackShadow.pop();
+					this.tagsStackShadow.pop();
 					// to close an open if
 					// start a new if
 					print("} else {");
-					markLine(parser.getLineNumber() + i);
+					markLine(this.parser.getLineNumber() + i);
 					println();
-					Tag.TagIf iftag = new Tag.TagIf("", parser.getLineNumber());
+					Tag.TagIf iftag = new Tag.TagIf("", this.parser.getLineNumber());
 					pushToStack(iftag);
 				} else {
-					throw new JapidCompilationException(template, parser.getLineNumber() + i, "the open \"else\" statement is not properly matched to a previous if");
+					throw new JapidCompilationException(this.template, this.parser.getLineNumber() + i, "the open \"else\" statement is not properly matched to a previous if");
 				}
 			} else if (line.trim().matches(OPEN_FOR_PATTERN_STRING)) {
 				// simply replace it with a "each" tag call
@@ -653,12 +657,12 @@ public abstract class JapidAbstractCompiler {
 				if (matcher.matches()) {
 					String instanceDecl = matcher.group(1);
 					if (!JavaSyntaxTool.isValidSingleVarDecl(instanceDecl))
-						throw new JapidCompilationException(template, parser.getLineNumber() + i, "loop variable declaration error: " + instanceDecl);
+						throw new JapidCompilationException(this.template, this.parser.getLineNumber() + i, "loop variable declaration error: " + instanceDecl);
 					instanceDecl = JavaSyntaxTool.cleanDeclPrimitive(instanceDecl);
 					
 					String collection = matcher.group(2);
 					if (!JavaSyntaxTool.isValidExpr(collection))
-						throw new JapidCompilationException(template, parser.getLineNumber() + i, "syntax error: " + collection);
+						throw new JapidCompilationException(this.template, this.parser.getLineNumber() + i, "syntax error: " + collection);
 
 					expr = "each " + collection + " | " + instanceDecl;
 					Tag tag = buildTagDirective(expr);
@@ -668,26 +672,26 @@ public abstract class JapidAbstractCompiler {
 				} else {
 					// should not happen
 					print(expr);
-					markLine(parser.getLineNumber() + i);
+					markLine(this.parser.getLineNumber() + i);
 					println();
 				}
 			} else if (line.trim().length() == 0) {
 				// a single ` empty line, treated as the closing for `tag
 				try {
-					Tag tagShadow = tagsStackShadow.peek();
+					Tag tagShadow = this.tagsStackShadow.peek();
 					if (tagShadow.isRoot()) {
 						// System.out.println("");
 					} else {
-						tagShadow = tagsStackShadow.pop();
+						tagShadow = this.tagsStackShadow.pop();
 
 						if (tagShadow instanceof TagIf) {
 							// to close an open if
 							print("}");
-							markLine(parser.getLineNumber() + i);
+							markLine(this.parser.getLineNumber() + i);
 							println();
 						} else {
-							if (!tagsStack.empty()) {
-								Tag tag = tagsStack.peek();
+							if (!this.tagsStack.empty()) {
+								Tag tag = this.tagsStack.peek();
 								if (!tag.isRoot()) {
 									tag = popStack();
 									endTag(tag);
@@ -703,12 +707,12 @@ public abstract class JapidAbstractCompiler {
 				// OK plain Java code
 				if (line.length() > 0) {
 					print(line);
-					markLine(parser.getLineNumber() + i);
+					markLine(this.parser.getLineNumber() + i);
 					println();
 				}
 			}
 		}
-		skipLineBreak = true;
+		this.skipLineBreak = true;
 	}
 
 	/**
@@ -743,8 +747,8 @@ public abstract class JapidAbstractCompiler {
 	 * @param line
 	 * @return
 	 */
-	private String parseInclude(String line) {
-		line = line.trim();
+	private String parseInclude(String _line) {
+		String line = _line.trim();
 		if (line.startsWith(INCLUDE + " ") || line.startsWith(INCLUDE + "\t")) {
 			line = line.substring(INCLUDE.length()).trim();
 		}
@@ -752,7 +756,7 @@ public abstract class JapidAbstractCompiler {
 			return line;
 		}
 		else {
-			throw new JapidCompilationException(template, parser.getLineNumber(),
+			throw new JapidCompilationException(this.template, this.parser.getLineNumber(),
 					"the include target must end with .include");
 
 		}
@@ -767,23 +771,24 @@ public abstract class JapidAbstractCompiler {
 		println(String.format(format, target));
 	}
 
-	private void handleOpenElseIf(int i, String expr, boolean negative) {
+	private void handleOpenElseIf(int i, String _expr, boolean negative) {
 //		expr = expr.substring(1).trim();
 		// end previous if shadow and star a new one
+		String expr = _expr;
 		verifyExpr(expr);
-		Tag tagShadow = tagsStackShadow.peek();
+		Tag tagShadow = this.tagsStackShadow.peek();
 		if (tagShadow instanceof TagIf) {
-			tagsStackShadow.pop();
+			this.tagsStackShadow.pop();
 			// to close an open if
 			// start a new if
-			Tag.TagIf iftag = new Tag.TagIf(expr, parser.getLineNumber());
+			Tag.TagIf iftag = new Tag.TagIf(expr, this.parser.getLineNumber());
 			pushToStack(iftag);
 			expr = "} else if(" + (negative ? "!" : "") + "asBoolean(" + expr + ")) {";
 			print(expr);
-			markLine(parser.getLineNumber() + i);
+			markLine(this.parser.getLineNumber() + i);
 			println();
 		} else {
-			throw new JapidCompilationException(template, parser.getLineNumber(), "the open \"else if\" statement is not properly matched to a previous if");
+			throw new JapidCompilationException(this.template, this.parser.getLineNumber(), "the open \"else if\" statement is not properly matched to a previous if");
 		}
 	}
 
@@ -802,14 +807,14 @@ public abstract class JapidAbstractCompiler {
 		if (!ex.endsWith("{")) {
 			// true open. out a shadow tag, since we want reuse the
 			// ` as the end delimiter
-			Tag.TagIf iftag = new Tag.TagIf(ex, parser.getLineNumber());
+			Tag.TagIf iftag = new Tag.TagIf(ex, this.parser.getLineNumber());
 			pushToStack(iftag);
 		}
 		ex = removeEndingString(ex, "{").trim();
 		verifyExpr(ex);
 		ex = "if(" + (negative ? "!" : "") + "asBoolean(" + ex + ")) {";
 		print(ex);
-		markLine(parser.getLineNumber() + i);
+		markLine(this.parser.getLineNumber() + i);
 		println();
 	}
 
@@ -829,8 +834,8 @@ public abstract class JapidAbstractCompiler {
 	 * @param string
 	 * @return
 	 */
-	protected static boolean startsWithIgnoreSpace(String line, String string) {
-		line = line.trim();
+	protected static boolean startsWithIgnoreSpace(String _line, String string) {
+		String line = _line.trim();
 		return line.startsWith(string + " ") || line.startsWith(string + "\t");
 	}
 
@@ -846,16 +851,15 @@ public abstract class JapidAbstractCompiler {
 	/**
 	 * @param args
 	 */
-	private void doActionInvokeDirective(String args) {
+	private void doActionInvokeDirective(String _args) {
 		if (!getTemplateClassMetaData().useWithPlay) {
-			throw new JapidCompilationException(template, parser.getLineNumber(), "action invocation is only supported in Play environment. ");
-		} else {
-			this.getTemplateClassMetaData().setHasActionInvocation();
-			if (args.trim().length() == 0)
-				args = "whatyouwantoinvoke()";
-			printActionInvocation(args);
+			throw new JapidCompilationException(this.template, this.parser.getLineNumber(), "action invocation is only supported in Play environment. ");
 		}
-		
+		String args = _args;
+		this.getTemplateClassMetaData().setHasActionInvocation();
+		if (args.trim().length() == 0)
+			args = "whatyouwantoinvoke()";
+		printActionInvocation(args);
 	}
 
 	/**
@@ -865,7 +869,7 @@ public abstract class JapidAbstractCompiler {
 		Tag tag = buildTagDirective(tagline);
 		startTag(tag);
 		if (!tag.hasBody) { // one liner.
-			tag = tagsStackShadow.pop();
+			tag = this.tagsStackShadow.pop();
 			tag = popStack();
 			endTag(tag);
 		}
@@ -914,7 +918,7 @@ public abstract class JapidAbstractCompiler {
 
 	private void verifyExpr(String expr) {
 		if (!JavaSyntaxTool.isValidExpr(expr)) {
-			throw new JapidCompilationException(template, parser.getLineNumber(), "invalid Java expression: " + expr);
+			throw new JapidCompilationException(this.template, this.parser.getLineNumber(), "invalid Java expression: " + expr);
 		}
 	}
 
@@ -925,18 +929,18 @@ public abstract class JapidAbstractCompiler {
 	}
 
 	protected void markLine() {
-		markLine(parser.getLineNumber());
+		markLine(this.parser.getLineNumber());
 	}
 
-	protected void message(String token) {
-		token = token.trim();
+	protected void message(String _token) {
+		String token = _token.trim();
 		List<String> args = null;
 		try {
 			args = JavaSyntaxTool.parseArgs(token);
 		} catch (RuntimeException e) {
 			throw new JapidCompilationException(
-					template,
-					parser.getLineNumber(),
+					this.template,
+					this.parser.getLineNumber(),
 					"Message lookup commmand takes arguments like in a Java method call. Don't use single quotation marks to quote a message name for instance. "
 							+ token);
 		}
@@ -951,8 +955,8 @@ public abstract class JapidAbstractCompiler {
 			}
 		} else {
 			throw new JapidCompilationException(
-					template,
-					parser.getLineNumber(),
+					this.template,
+					this.parser.getLineNumber(),
 					"Message lookup commmand must take arguments. Bad number of args: "
 							+ token);
 		}
@@ -992,23 +996,23 @@ public abstract class JapidAbstractCompiler {
 			}
 		} else {
 			if (!action.endsWith(")")) {
-				throw new JapidCompilationException(template, parser.getLineNumber(), "action argument must be a method call. It was: " + action);
+				throw new JapidCompilationException(this.template, this.parser.getLineNumber(), "action argument must be a method call. It was: " + action);
 			}
 			
 			try {
 				List<String> parseArgs = JavaSyntaxTool.parseArgs(action);
 				if (parseArgs.size() != 1) {
-					throw new JapidCompilationException(template, parser.getLineNumber(), "action argument must be a method call. It was: " + action);
+					throw new JapidCompilationException(this.template, this.parser.getLineNumber(), "action argument must be a method call. It was: " + action);
 				}
 			} catch (RuntimeException e) {
-				throw new JapidCompilationException(template, parser.getLineNumber(), "action argument must be a method call. It was: " + action);
+				throw new JapidCompilationException(this.template, this.parser.getLineNumber(), "action argument must be a method call. It was: " + action);
 			}
 			
 			
 			// extract params if any
 			int indexOfParam = action.indexOf("(");
 			if (indexOfParam < 1) {
-				throw new JapidCompilationException(template, parser.getLineNumber(), "action arguments must be enclosed in parenthesis.");
+				throw new JapidCompilationException(this.template, this.parser.getLineNumber(), "action arguments must be enclosed in parenthesis.");
 			}
 
 			String actionPart = action.substring(0, indexOfParam).trim();
@@ -1031,12 +1035,12 @@ public abstract class JapidAbstractCompiler {
 
 	protected void hop() {
 
-		String source = template.source;
+		String source = this.template.source;
 		Tag rootTag = new Tag() {
 			{
-				tagName = ROOT_TAGNAME;
-				startLine = 0;
-				hasBody = true;
+				this.tagName = ROOT_TAGNAME;
+				this.startLine = 0;
+				this.hasBody = true;
 			}
 		};
 
@@ -1045,19 +1049,19 @@ public abstract class JapidAbstractCompiler {
 
 		this.parser = new JapidParser(source);
 		
-		getTemplateClassMetaData().setContentType(template.contentTypeHeader);
-		getTemplateClassMetaData().packageName = template.packageName;
-		getTemplateClassMetaData().setClassName(template.className);
+		getTemplateClassMetaData().setContentType(this.template.contentTypeHeader);
+		getTemplateClassMetaData().packageName = this.template.packageName;
+		getTemplateClassMetaData().setClassName(this.template.className);
 
 		parse();
 
 		Tag tag = popStack();
-		if (!tagsStack.empty())
-			throw new JapidCompilationException(template, parser.getLineNumber(), "There is(are) " + tagsStack.size() + " unclosed tag(s) in the template: " + this.template.name);
+		if (!this.tagsStack.empty())
+			throw new JapidCompilationException(this.template, this.parser.getLineNumber(), "There is(are) " + this.tagsStack.size() + " unclosed tag(s) in the template: " + this.template.name);
 		// remove print nothing statement to save a few CPU cycles
 		this.getTemplateClassMetaData().body = tag.getBodyText().replace("p(\"\")", "").replace("pln(\"\")", "pln()");
 		postParsing(tag);
-		template.javaSource = this.getTemplateClassMetaData().generateCode();
+		this.template.javaSource = this.getTemplateClassMetaData().generateCode();
 
 	}
 
@@ -1073,11 +1077,11 @@ public abstract class JapidAbstractCompiler {
 	abstract protected AbstractTemplateClassMetaData getTemplateClassMetaData();
 
 	protected void templateArgs(String token) {
-		Integer lineNumber = parser.getLineNumber();
+		Integer lineNumber = this.parser.getLineNumber();
 		try {
 			JavaSyntaxTool.parseParams(token);
 		} catch (RuntimeException e) {
-			throw new JapidCompilationException(template, lineNumber, e.getMessage());
+			throw new JapidCompilationException(this.template, lineNumber, e.getMessage());
 		}
 		Tag currentTag = this.tagsStack.peek();
 		currentTag.callbackArgs = token;
@@ -1090,13 +1094,13 @@ public abstract class JapidAbstractCompiler {
 	protected Tag buildTag(String token) {
 		String tagText = token.trim().replaceAll(NEW_LINE, SPACE);
 
-		boolean hasBody = !parser.checkNext().endsWith("/");
+		boolean hasBody = !this.parser.checkNext().endsWith("/");
 
-		Integer lineNumber = parser.getLineNumber();
+		Integer lineNumber = this.parser.getLineNumber();
 		try {
 			Tag tag = new TagInvocationLineParser().parse(tagText);
 			if (tag.tagName == null || tag.tagName.length() == 0)
-				throw new JapidCompilationException(template, lineNumber, "tag name was empty: " + tagText);
+				throw new JapidCompilationException(this.template, lineNumber, "tag name was empty: " + tagText);
 
 			if (tag.tagName.startsWith(".")) {
 				// partial path, use current package as the root and append the path
@@ -1105,10 +1109,10 @@ public abstract class JapidAbstractCompiler {
 			}
 			tag.startLine = lineNumber;
 			tag.hasBody = hasBody;
-			tag.tagIndex = tagIndex++;
+			tag.tagIndex = this.tagIndex++;
 			return tag;
 		} catch (RuntimeException e) {
-			throw new JapidCompilationException(template, lineNumber, e.getMessage());
+			throw new JapidCompilationException(this.template, lineNumber, e.getMessage());
 		}
 	}
 
@@ -1127,21 +1131,21 @@ public abstract class JapidAbstractCompiler {
 		try {
 			Tag tag = new TagInvocationLineParser().parse(tagText);
 			if (tag.tagName == null || tag.tagName.length() == 0)
-				throw new JapidCompilationException(template, tag.startLine, "tag name was empty: " + tagText);
+				throw new JapidCompilationException(this.template, tag.startLine, "tag name was empty: " + tagText);
 
 			if (tag.tagName.startsWith(".")) {
 				// partial path, use current package as the root and append the path
 				// to it
 				tag.tagName = getTemplateClassMetaData().packageName + tag.tagName;
 			}
-			tag.startLine = parser.getLineNumber();
-			tag.tagIndex = tagIndex++;
+			tag.startLine = this.parser.getLineNumber();
+			tag.tagIndex = this.tagIndex++;
 			return tag;
 		} catch (RuntimeException e) {
 			if (e instanceof JapidCompilationException)
 				throw e;
 			else
-				throw new JapidCompilationException(template, parser.getLineNumber(), e.getMessage());
+				throw new JapidCompilationException(this.template, this.parser.getLineNumber(), e.getMessage());
 		}
 	}
 
@@ -1154,7 +1158,7 @@ public abstract class JapidAbstractCompiler {
 		// remove the argument part to extract action string as key base
 		int left = action.indexOf('(');
 		if (left < 1) {
-			throw new JapidCompilationException(template, parser.getLineNumber(), "invoke: action arguments must be enclosed in parenthesis.");
+			throw new JapidCompilationException(this.template, this.parser.getLineNumber(), "invoke: action arguments must be enclosed in parenthesis.");
 		}
 		int right = action.lastIndexOf(')');
 		String actionPath = "\"" + action.substring(0, left) + "\"";
@@ -1182,7 +1186,7 @@ public abstract class JapidAbstractCompiler {
 		try {
 			print(createActionRunner(action));
 		} catch (RuntimeException e) {
-			throw new JapidCompilationException(template, parser.getLineNumber(), "invalid argument syntax to invoke an action: " + action);
+			throw new JapidCompilationException(this.template, this.parser.getLineNumber(), "invalid argument syntax to invoke an action: " + action);
 		}
 	}
 
@@ -1252,7 +1256,7 @@ public abstract class JapidAbstractCompiler {
 	 */
 	protected void invokeAction(Tag tag) {
 		if (tag.hasBody) {
-			throw new JapidCompilationException(template, parser.getLineNumber(), "invoke tag cannot have a body. Must be ended with /}");
+			throw new JapidCompilationException(this.template, this.parser.getLineNumber(), "invoke tag cannot have a body. Must be ended with /}");
 		}
 
 		this.getTemplateClassMetaData().setHasActionInvocation();
@@ -1329,8 +1333,8 @@ public abstract class JapidAbstractCompiler {
 		// recursively search the stack for TagInTag
 		Tag t;
 		try {
-			for (int i = tagsStack.size(); i > 0; i--) {
-				t = tagsStack.get(i - 1);
+			for (int i = this.tagsStack.size(); i > 0; i--) {
+				t = this.tagsStack.get(i - 1);
 				if (t instanceof TagInTag) {
 					return (TagInTag) t;
 				}
@@ -1352,7 +1356,7 @@ public abstract class JapidAbstractCompiler {
 		if (tag.hasBody) { // must always
 			this.getTemplateClassMetaData().addDefTag((TagDef) tag);
 		} else {
-			throw new JapidCompilationException(template, tag.startLine, "def tag must have a body");
+			throw new JapidCompilationException(this.template, tag.startLine, "def tag must have a body");
 		}
 	}
 
@@ -1383,7 +1387,7 @@ public abstract class JapidAbstractCompiler {
 		markLine(tag.startLine);
 		println();
 		// tagIndex--;
-		skipLineBreak = true;
+		this.skipLineBreak = true;
 	}
 
 	abstract void endSet(TagSet tag);
@@ -1408,7 +1412,7 @@ public abstract class JapidAbstractCompiler {
 
 		if (ttl == null) {
 			// should be deprecated
-			String template =
+			String _template =
 					"		%s.put(getOut().length(), new %s() {\n" +
 							"			@Override\n" +
 							"			public %s run() {\n" +
@@ -1421,50 +1425,49 @@ public abstract class JapidAbstractCompiler {
 							"				throw new RuntimeException(\"No render result from running: %s\");\n" +
 							"			}\n" +
 							"		});";
-			return String.format(template,
+			return String.format(_template,
 					AbstractTemplateClassMetaData.ACTION_RUNNERS,
 					ActionRunner.class.getName(),
 					RenderResult.class.getName(),
 					action,
 					JAPID_RESULT,
 					actionEscaped);
-		} else {
-			String template =
-					"		%s.put(getOut().length(), new %s(%s, %s, %s, %s) {\n" +
-							"			@Override\r\n" +
-							"			public %s runPlayAction()  {\n" +
-							// "				super.checkActionCacheFor(%s.class, \"%s\");\n"
-							// +
-							"				return (%s)%s; " + makeLineMarker(parser.getLineNumber()) + "\n" +
-							"			}\n" +
-							"		}); p(\"\\n\");"; // hack: a new line char to stand for the action position.
-			// Should really change the action runner collection to <int, List<ActionRunner>> 
-			
-			// hard-code the cache action runner name to avoid dependency on the
-			// Play jar
-			return String.format(template,
-					AbstractTemplateClassMetaData.ACTION_RUNNERS,
-					"cn.bran.play.CacheablePlayActionRunner",
-					ttl,
-					controllerName + ".class",
-					"\"" + actionName + "\"",
-					"".equals(keys) ? "\"\"" : keys,
-					JAPID_RESULT,
-					JAPID_RESULT,
-					action
-					);
-			// return String.format(template,
-			// AbstractTemplateClassMetaData.ACTION_RUNNERS,
-			// "cn.bran.play.CacheablePlayActionRunner",
-			// ttl,
-			// base,
-			// "".equals(keys) ? "\"\"" : keys,
-			// JAPID_RESULT,
-			// controllerName,
-			// actionName,
-			// action
-			// );
 		}
+		String _template =
+				"		%s.put(getOut().length(), new %s(%s, %s, %s, %s) {\n" +
+						"			@Override\r\n" +
+						"			public %s runPlayAction()  {\n" +
+						// "				super.checkActionCacheFor(%s.class, \"%s\");\n"
+						// +
+						"				return (%s)%s; " + makeLineMarker(this.parser.getLineNumber()) + "\n" +
+						"			}\n" +
+						"		}); p(\"\\n\");"; // hack: a new line char to stand for the action position.
+		// Should really change the action runner collection to <int, List<ActionRunner>> 
+		
+		// hard-code the cache action runner name to avoid dependency on the
+		// Play jar
+		return String.format(_template,
+				AbstractTemplateClassMetaData.ACTION_RUNNERS,
+				"cn.bran.play.CacheablePlayActionRunner",
+				ttl,
+				controllerName + ".class",
+				"\"" + actionName + "\"",
+				"".equals(keys) ? "\"\"" : keys,
+				JAPID_RESULT,
+				JAPID_RESULT,
+				action
+				);
+		// return String.format(template,
+		// AbstractTemplateClassMetaData.ACTION_RUNNERS,
+		// "cn.bran.play.CacheablePlayActionRunner",
+		// ttl,
+		// base,
+		// "".equals(keys) ? "\"\"" : keys,
+		// JAPID_RESULT,
+		// controllerName,
+		// actionName,
+		// action
+		// );
 
 	}
 
@@ -1491,16 +1494,16 @@ public abstract class JapidAbstractCompiler {
 		TagInTag tagtagf = getTagInTag();
 		if (tagtagf != null) {
 			if (tag instanceof TagInTag) {
-				throw new JapidCompilationException(template, tag.startLine, "Syntax error: def/set tag cannot be nested in another def/set tag.");
+				throw new JapidCompilationException(this.template, tag.startLine, "Syntax error: def/set tag cannot be nested in another def/set tag.");
 			}
 			
 			if (!(tag instanceof TagIf))
 				tagtagf.tags.add(tag);
 		}
 
-		tagsStackShadow.push(tag);
+		this.tagsStackShadow.push(tag);
 		if (!(tag instanceof TagIf))
-			tagsStack.push(tag);
+			this.tagsStack.push(tag);
 
 	}
 }

@@ -11,11 +11,12 @@ public enum MimeTypeEnum {
 	
 	public String header;
 	
-	MimeTypeEnum(String header) {
-		this.header = header;
+	MimeTypeEnum(String _header) {
+		this.header = _header;
 	}
 	
-	public static String getHeader(String ext) {
+	public static String getHeader(String _ext) {
+		String ext = _ext;
 		if (ext.startsWith("."))
 			ext = ext.substring(1);
 		ext = ext.toLowerCase();

@@ -32,7 +32,7 @@ public abstract class JapidTemplateBaseStreaming {
 //	private PrintWriter out;
 	private OutputStream out;
 	protected OutputStream getOut() {
-		return out;
+		return this.out;
 	}
 	
 	public JapidTemplateBaseStreaming(OutputStream out2) {
@@ -56,7 +56,7 @@ public abstract class JapidTemplateBaseStreaming {
 
 	final protected void p(byte[] ba) {
 		try {
-			out.write(ba);
+			this.out.write(ba);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -73,7 +73,7 @@ public abstract class JapidTemplateBaseStreaming {
 	final protected void pln(String s) {
 		try {
 			writeString(s);
-			out.write('\n');
+			this.out.write('\n');
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -90,13 +90,13 @@ public abstract class JapidTemplateBaseStreaming {
 //		out.write(bb.array(), 0, bb.position());
 		// ok my code is slower in large trunk of data
 		if (s != null)
-			out.write(s.getBytes("UTF-8"));
+			this.out.write(s.getBytes("UTF-8"));
 	}
 	
 	final protected void pln(byte[] ba) {
 		try {
-			out.write(ba);
-			out.write('\n');
+			this.out.write(ba);
+			this.out.write('\n');
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -116,7 +116,7 @@ public abstract class JapidTemplateBaseStreaming {
 	private void writeObject(Object s) {
 		try {
 			if (s instanceof byte[]) {
-				out.write((byte[])s);
+				this.out.write((byte[])s);
 			}
 			else {
 				writeString(s.toString());
@@ -137,7 +137,7 @@ public abstract class JapidTemplateBaseStreaming {
 
 	final protected void pln() {
 		try {
-			out.write('\n');
+			this.out.write('\n');
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

@@ -19,8 +19,8 @@ public class TemplateClass {
 	public TemplateClass(String src) {
 		try {
 			this.cu = JavaSyntaxTool.parse(src);
-			List<TypeDeclaration> types = cu.getTypes();
-			name = types.get(0).getName();
+			List<TypeDeclaration> types = this.cu.getTypes();
+			this.name = types.get(0).getName();
 		} catch (ParseException e) {
 			String m = e.getMessage();
 			m.substring(0, m.indexOf('\n'));
