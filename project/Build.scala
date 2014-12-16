@@ -19,6 +19,9 @@ object ApplicationBuild extends Build {
   )
 
   val main = Project(appName, file(".")).enablePlugins(play.PlayJava).settings(
+        organization := "com.vitriko",
+        organizationName := "Vitriko",
+    	organizationHomepage := Some(new URL("http://www.hablandodeweb.com")      
     version := appVersion,
     libraryDependencies ++= appDependencies,
     javacOptions in Compile ++= Seq("-source", "1.6", "-target", "1.6"),
@@ -36,7 +39,7 @@ object ApplicationBuild extends Build {
 	    Some("releases" at nexus + "releases")
   }
   
-  	organization := "com.github.branaway"
+  	organization := "com.vitriko"
 
 	publishMavenStyle := true
 	
@@ -45,7 +48,7 @@ object ApplicationBuild extends Build {
 	pomIncludeRepository := { x => false }
 	
 	pomExtra := (
-		  <url>http://branaway.github.com/japid42.hrml</url>
+		  <url>https://github.com/pabloluisperez/japid42</url>
 		  <licenses>
     <license>
       <name>BSD-style</name>
