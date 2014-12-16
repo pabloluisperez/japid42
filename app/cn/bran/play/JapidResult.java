@@ -61,7 +61,7 @@ public class JapidResult extends Results.Status implements Externalizable, Conte
 		this.renderResult = r;
 		this.setHeaders(r.getHeaders());
     	Seq<scala.Tuple2<String, String>> seq = scala.collection.JavaConversions.mapAsScalaMap(this.renderResult.getHeaders()).toSeq();
-		super.getWrappedSimpleResult().withHeaders(seq);
+		super.toScala().withHeaders(seq);
 	}
 
 	public JapidResult() {

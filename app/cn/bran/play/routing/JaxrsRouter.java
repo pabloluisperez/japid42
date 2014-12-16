@@ -16,18 +16,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.reflections.Reflections;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
 
-import cn.bran.japid.util.JapidFlags;
 import play.Application;
 import play.GlobalSettings;
 import play.api.mvc.Handler;
 import play.libs.F.Tuple;
 import play.mvc.Result;
-import play.mvc.SimpleResult;
+import cn.bran.japid.util.JapidFlags;
 
 /**
  * @author bran
@@ -101,42 +96,41 @@ public class JaxrsRouter {
 			// serve static asset
 //			return controllers.Assets.at(assetServing[1], r.path().replaceFirst(assetServing[0], ""));
 			return null;
-		} else {
-			final RouterClass targetRouterClass = RouterUtils.findLongestMatch(routerClasses, r);
-			if (targetRouterClass == null)
-				return null;
+		}
+		final RouterClass targetRouterClass = RouterUtils.findLongestMatch(routerClasses, r);
+		if (targetRouterClass == null)
+			return null;
 
-			final Tuple<Method, Object[]> methodWithArgs = targetRouterClass.findMethodAndGenerateArgs(r);
+		final Tuple<Method, Object[]> methodWithArgs = targetRouterClass.findMethodAndGenerateArgs(r);
 
-			if (methodWithArgs != null) {
-				ResultBuilder resultBuilder = new ResultBuilder() {
-					@Override
-					public SimpleResult create() {
-						try {
-							Method m = methodWithArgs._1;
-							Class<?> cl = targetRouterClass.clz;
-							Object obj = global.getControllerInstance(cl);
-							if (obj == null && (m.getModifiers() & Modifier.STATIC) != Modifier.STATIC) {
-								throw new RuntimeException("the action method is not static while the target object is null: " + targetRouterClass.clz + "#" + m.getName());
-							}
-							Object[] args = methodWithArgs._2;
-							SimpleResult result = (SimpleResult)m.invoke(obj, args);
-							Produces produces = methodWithArgs._1.getAnnotation(Produces.class);
-							return produces != null ? new WrapProducer(produces.value()[0], result) : result;
-						} catch (InvocationTargetException cause) {
-							System.err.println("Exception occured while trying to invoke: " + targetRouterClass.clz.getName()
-									+ "#" + methodWithArgs._1.getName() + " with " + methodWithArgs._2 + " for uri:" + r.path());
-							throw new RuntimeException(cause.getCause());
-						} catch (Exception e) {
-							e.printStackTrace();
-							throw new RuntimeException(e.getCause());
+		if (methodWithArgs != null) {
+			ResultBuilder resultBuilder = new ResultBuilder() {
+				@Override
+				public Result create() {
+					try {
+						Method m = methodWithArgs._1;
+						Class<?> cl = targetRouterClass.clz;
+						Object obj = global.getControllerInstance(cl);
+						if (obj == null && (m.getModifiers() & Modifier.STATIC) != Modifier.STATIC) {
+							throw new RuntimeException("the action method is not static while the target object is null: " + targetRouterClass.clz + "#" + m.getName());
 						}
+						Object[] args = methodWithArgs._2;
+						Result result = (Result)m.invoke(obj, args);
+						Produces produces = methodWithArgs._1.getAnnotation(Produces.class);
+						return produces != null ? new WrapProducer(produces.value()[0], result) : result;
+					} catch (InvocationTargetException cause) {
+						System.err.println("Exception occured while trying to invoke: " + targetRouterClass.clz.getName()
+								+ "#" + methodWithArgs._1.getName() + " with " + methodWithArgs._2 + " for uri:" + r.path());
+						throw new RuntimeException(cause.getCause());
+					} catch (Exception e) {
+						e.printStackTrace();
+						throw new RuntimeException(e.getCause());
 					}
-				};
+				}
+			};
 
-				JavaActionBridge handler = new JavaActionBridge(targetRouterClass.clz, methodWithArgs._1, resultBuilder);
-				return handler;
-			}
+			JavaActionBridge handler = new JavaActionBridge(targetRouterClass.clz, methodWithArgs._1, resultBuilder);
+			return handler;
 		}
 		JapidFlags.debug("Japid router could not route this request");
 		return null;

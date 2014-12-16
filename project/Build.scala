@@ -1,39 +1,42 @@
 import sbt._
 import Keys._
-import play.Project._
+import play.Play.autoImport._
+import PlayKeys._
 
 object ApplicationBuild extends Build {
 
   val appName         = "japid42"
-  val appVersion      = "0.9.17" // note: update the version name in the JapidRenderer to match this.
+  val appVersion      = "0.10" // note: update the version name in the JapidRenderer to match this.
 
   val appDependencies = Seq(
     javaCore
     ,cache
     ,"org.apache.commons" % "commons-email" % "1.2"
-    ,"org.apache.commons" % "commons-lang3" % "3.1"
-    ,"org.eclipse.tycho" % "org.eclipse.jdt.core" % "3.8.2.v20120814-155456"
-    ,"com.google.code.javaparser" % "javaparser" % "1.0.8"
-    ,"javax.ws.rs" % "jsr311-api" % "1.1-ea"
+    ,"org.apache.commons" % "commons-lang3" % "3.3.2"
+    ,"org.eclipse.tycho" % "org.eclipse.jdt.core" % "3.10.0.v20140604-1726"
+    ,"com.google.code.javaparser" % "javaparser" % "1.0.11"
+    ,"javax.ws.rs" % "jsr311-api" % "1.1.1"
   )
 
-  val main = play.Project(
-    appName, appVersion, appDependencies
-  ).settings(
-	 javacOptions in Compile ++= Seq("-source", "1.6", "-target", "1.6")
-  )
+  val main = Project(appName, file(".")).enablePlugins(play.PlayJava).settings(
+    version := appVersion,
+    libraryDependencies ++= appDependencies,
+    javacOptions in Compile ++= Seq("-source", "1.6", "-target", "1.6"),
+//    scalaVersion := "2.10.4"
+    scalaVersion := "2.11.1" 
+  )  
 
-  /*
-  publishTo := Some(Resolver.file("file",  new File( "~bran/projects/branaway.github.com/releases" )) )
+  
+  publishTo := Some(Resolver.file("file",  new File( "C:\\Portables\\Despliegues" )) )
   publishTo <<= version { (v: String) =>
 	  val nexus = "https://oss.sonatype.org/"
 	  if (v.trim.endsWith("SNAPSHOT")) 
-	    Some("snapshots" at nexus + "content/repositories/snapshots")
+	    Some("snapshots" at nexus + "snapshots")
 	  else                             
-	    Some("releases" at nexus + "service/local/staging/deploy/maven2")
+	    Some("releases" at nexus + "releases")
   }
   
-  organization := "com.github.branaway"
+  	organization := "com.github.branaway"
 
 	publishMavenStyle := true
 	
@@ -51,16 +54,16 @@ object ApplicationBuild extends Build {
     </license>
   </licenses>
 		  <scm>
-    <url>git@github.com:branaway/japid42.git</url>
-    <connection>scm:git:git@github.com:branaway/japid42.git</connection>
+    <url>git@github.com:pabloluisperez/japid42.git</url>
+    <connection>scm:git:git@github.com:pabloluisperez/japid42.git</connection>
   </scm>
 		  <developers>
     <developer>
-      <id>branaway</id>
-      <name>Bing Ran</name>
-      <url>http://iclass.com</url>
+      <id>pabloluisperez</id>
+      <name>Pablo Perez</name>
+      <url>http://hablandodeweb.com</url>
     </developer>
   </developers>
 	)
-*/
+
 }

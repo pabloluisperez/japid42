@@ -16,20 +16,20 @@ import play.api.mvc.Handler;
 import play.cache.Cache;
 import play.cache.Cached;
 import play.core.Router.Routes;
+import play.libs.F.Promise;
 import play.mvc.Action;
-import play.mvc.Results;
 import play.mvc.Http.Context;
 import play.mvc.Http.Request;
 import play.mvc.Http.RequestHeader;
-import play.mvc.SimpleResult;
+import play.mvc.Result;
+import play.mvc.Results;
+import scala.Option;
+import scala.Tuple3;
+import scala.collection.Seq;
 import cn.bran.japid.template.JapidRenderer;
 import cn.bran.japid.util.JapidFlags;
 import cn.bran.japid.util.StringUtils;
 import cn.bran.play.routing.JaxrsRouter;
-import play.libs.F.Promise;
-import scala.Option;
-import scala.Tuple3;
-import scala.collection.Seq;
 
 /**
  * @author bran
@@ -47,13 +47,13 @@ public class GlobalSettingsWithJapid extends GlobalSettings {
 	private boolean useJaxrs = true;
 
 	
-	public GlobalSettingsWithJapid() {
-		System.out.println("GlobalSettingsWithJapid.<init>()");
-	}
-	
-	static {
-		System.out.println("GlobalSettingsWithJapid.<cinit>()");
-	}
+//	public GlobalSettingsWithJapid() {
+//		System.out.println("GlobalSettingsWithJapid.<init>()");
+//	}
+//	
+//	static {
+//		System.out.println("GlobalSettingsWithJapid.<cinit>()");
+//	}
 
 	/**
 	 * @author Bing Ran (bing.ran@hotmail.com)
@@ -127,7 +127,7 @@ public class GlobalSettingsWithJapid extends GlobalSettings {
 		if (!this.cacheResponse) {
 			return new Action.Simple() {
 				@Override
-				public Promise<SimpleResult> call(Context ctx) throws Throwable {
+				public Promise<Result> call(Context ctx) throws Throwable {
 					// pass the FQN to the japid controller to determine the
 					// template to use
 					// will be cleared right when the value is retrieved in the
@@ -135,7 +135,7 @@ public class GlobalSettingsWithJapid extends GlobalSettings {
 					// assuming the delegate call will take place in the same
 					// thread
 					threadData.put(ACTION_METHOD, actionName);
-					Promise<SimpleResult> call = this.delegate.call(ctx);
+					Promise<Result> call = this.delegate.call(ctx);
 					threadData.remove(ACTION_METHOD);
 					return call;
 				}
@@ -144,11 +144,11 @@ public class GlobalSettingsWithJapid extends GlobalSettings {
 
 		return new Action<Cached>() {
 			@Override
-			public Promise<SimpleResult> call(Context ctx) {
+			public Promise<Result> call(Context ctx) {
 				try {
 					beforeActionInvocation(ctx, actionMethod);
 
-					SimpleResult result = null;
+					Result result = null;
 					Request req = ctx.request();
 					String method = req.method();
 					int duration = 0;
@@ -161,12 +161,12 @@ public class GlobalSettingsWithJapid extends GlobalSettings {
 							key = "urlcache:" + req.uri() + ":" + req.queryString();
 						}
 						duration = cachAnno.duration();
-						result = (SimpleResult) Cache.get(key);
+						result = (Result) Cache.get(key);
 					}
 					if (result == null) {
 						// pass the action name hint to japid controller
 						threadData.put(ACTION_METHOD, actionName);
-						Promise<SimpleResult> ps = this.delegate.call(ctx);
+						Promise<Result> ps = this.delegate.call(ctx);
 						threadData.remove(ACTION_METHOD);
 
 						if (!StringUtils.isEmpty(key) && duration > 0) {
@@ -381,11 +381,11 @@ public class GlobalSettingsWithJapid extends GlobalSettings {
 	 * @see play.GlobalSettings#onHandlerNotFound(play.mvc.Http.RequestHeader)
 	 */
 	@Override
-	public Promise<SimpleResult> onHandlerNotFound(RequestHeader arg0) {
+	public Promise<Result> onHandlerNotFound(RequestHeader arg0) {
 		if (_app.isDev()) {
 			List<Tuple3<String, String, String>> playRoutes = getPlayRoutes();
 			JapidResult r = new JapidResult(JapidRenderer.renderWith(japidviews.dev404.class, arg0, playRoutes, JaxrsRouter.getRouteTable()));
-			Promise<SimpleResult> pure = play.libs.F.Promise.pure((SimpleResult) Results.notFound(r));
+			Promise<Result> pure = play.libs.F.Promise.pure((Result) Results.notFound(r));
 			return pure;
 		} else
 			return super.onHandlerNotFound(arg0);

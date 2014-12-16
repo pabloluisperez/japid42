@@ -3,7 +3,7 @@
  */
 package cn.bran.play.routing;
 
-import play.mvc.SimpleResult;
+import play.mvc.Result;
 
 /**
  * @author bran
@@ -11,5 +11,5 @@ import play.mvc.SimpleResult;
  */
 
 interface ResultBuilder {
-	SimpleResult create();
+	Result create();
 }

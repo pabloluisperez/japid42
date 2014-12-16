@@ -97,7 +97,7 @@ public abstract class JapidAbstractCompiler {
 
 	public void compile(JapidTemplate t) {
 		this.template = t;
-		String tname = t.name;
+		String tname = t.name.replace('\\', '/');
 		int lastSlash = tname.lastIndexOf("/");
 		if (lastSlash >= 0) {
 			tname = tname.substring(lastSlash + 1);

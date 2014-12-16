@@ -606,3 +606,9 @@ Pay attention to the renderDynamic(...) and renderWith(...) methods.
 # bug fix: reflection did not detect added or removed controllers. See the new JaxrsRouter#getControllersWithPath()  
 # bug fix: added source and target spec for 1.6 in the build.scala
 # to be fixed: 
+
+2014.3.11 version 0.9.17.1
+# perf enhancement: avoided version checks while programmatic reloading when japid source project was used as a module.
+
+2014.3.11 version 0.10
+# Fork for play 2.3
