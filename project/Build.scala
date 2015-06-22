@@ -6,7 +6,7 @@ import PlayKeys._
 object ApplicationBuild extends Build {
 
   val appName         = "japid42"
-  val appVersion      = "0.10" // note: update the version name in the JapidRenderer to match this.
+  val appVersion      = "0.11" // note: update the version name in the JapidRenderer to match this.
 
   val appDependencies = Seq(
     javaCore
@@ -21,7 +21,7 @@ object ApplicationBuild extends Build {
   val main = Project(appName, file(".")).enablePlugins(play.PlayJava).settings(
         organization := "com.vitriko",
         organizationName := "Vitriko",
-    	organizationHomepage := Some(new URL("http://www.hablandodeweb.com")      
+    	organizationHomepage := Some(new URL("http://www.hablandodeweb.com")),      
     version := appVersion,
     libraryDependencies ++= appDependencies,
     javacOptions in Compile ++= Seq("-source", "1.6", "-target", "1.6"),
@@ -38,8 +38,8 @@ object ApplicationBuild extends Build {
 	  else                             
 	    Some("releases" at nexus + "releases")
   }
-  
-  	organization := "com.vitriko"
+    
+  organization := "com.vitriko"
 
 	publishMavenStyle := true
 	

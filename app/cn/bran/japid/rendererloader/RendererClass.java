@@ -121,7 +121,12 @@ public class RendererClass implements Serializable{
 		// can we have a line marker?
 		int lineMarker = line.lastIndexOf("// line ");
 		if (lineMarker > 0){ 
-			return Integer.parseInt(line.substring(lineMarker + 8).trim());
+			String trim = line.substring(lineMarker + 8).trim();
+			int commaPosition = trim.indexOf(",");
+			if(commaPosition>=0){
+				trim = trim.substring(0, trim.indexOf(","));
+			}
+			return Integer.parseInt(trim);
 		}
 		return -1;	
 
